@@ -1,1 +1,1 @@
-# KrATER
+# KrATER (K-mer Analysis Tool ER)
