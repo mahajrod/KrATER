@@ -32,12 +32,17 @@ II. Installation
         
         Variant 2: install from source code without installation
         
-            get KRATER
+            Get KRATER
                 git clone https://github.com/mahajrod/krater
         
-            add following string to ~/.profile , create file if absent. Don't forget to replace <KRATER_DIR> with actual pass
-            PYTHONPATH=${PYTHONPATH}:<KRATER_DIR>
+            Add following strings to ~/.profile and ~/.bashrc (create files if absent). Don't forget to replace <KRATER_DIR> with actual path
+            
+                PYTHONPATH=${PYTHONPATH}:<KRATER_DIR>
+                export PYTHONPATH
     
+            Run in terminal
+                source ~/.profile
+            
     
 III. RUN
 
