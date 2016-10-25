@@ -2,7 +2,7 @@
 
 I. Requirements
 
-    1. python libraries:
+    1. Python libraries:
         Matplotlib
         Numpy
         Scipy
@@ -18,12 +18,11 @@ II. Installation
             pip install --user matplotlib numpy scipy
 
     2. Install KrATER
-        Variant 0: install using pip
+        Variant 1: install using pip
         
                 TODO: add to pip
             
-        
-        Variant 1: install from source code with root permissions
+        Variant 2: install from source code with root permissions
         
             git clone https://github.com/mahajrod/krater
             cd KrATER
@@ -31,7 +30,7 @@ II. Installation
             sudo python setup.py install
         
         
-        Variant 2: install from source code without installation
+        Variant 3: install from source code without installation
         
             Get KRATER
                 git clone https://github.com/mahajrod/krater
