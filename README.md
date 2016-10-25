@@ -1,6 +1,7 @@
 # KrATER (K-mer Analysis Tool ER)
 
 I. Requirements
+
     1. python libraries:
         Matplotlib
         Numpy
