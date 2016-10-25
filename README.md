@@ -46,7 +46,7 @@ II. Installation
     
 III. RUN
 
-    1. Input file/files is/are fastq:
+    1. If nput file/files is/are fastq:
     
         Typical usage:
             <path to KRATER dir>/scripts/kmer/draw_kmer_distribution_from_fastq.py -m 23  -t ${THREAD_NUMBER} -b -s 30G -e png -o ${OUTPUT_PREFIX} -i {COMMA_SEPARATED_LIST_OF_FASTQ_FILES} -w ${MINIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE}  -g ${MAXIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE}
@@ -54,7 +54,7 @@ III. RUN
         Parameter description:
             
         
-    2. Input file is histogram file produced from jellyfish
+    2. If input file is histogram file produced by jellyfish:
     
         <path to KRATER dir>/draw_kmer_distribution_from_histo.py  -i ${JELLYFISH_HISTO_FILE}  -o ${OUTPUT_PREFIX} -w ${MINIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE} -g ${MAXIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE} -e png
         
