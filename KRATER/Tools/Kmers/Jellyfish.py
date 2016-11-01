@@ -231,6 +231,7 @@ class Jellyfish(Tool):
         check_peaks_coef:
             histogram is checked for presence of additional peaks in range [first_unique_peak, check_peaks_coef*first_unique_peak]
         """
+
         local_maximums_idx = argrelextrema(counts, np.greater, order=order, mode=mode)[0]
         local_minimums_idx = argrelextrema(counts, np.less, order=order, mode=mode)[0]
 
