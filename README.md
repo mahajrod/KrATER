@@ -25,7 +25,7 @@ II. Installation
         Variant 2: install from source code with root permissions
         
             git clone https://github.com/mahajrod/krater
-            cd KrATER
+            cd krater
             python setup.py build
             sudo python setup.py install
         
