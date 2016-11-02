@@ -115,9 +115,9 @@ class Jellyfish(Tool):
         unique_peak_width = unique_peak_borders[1] - unique_peak_borders[0] + 1
         #print unique_peak_borders
         #print unique_peak_width
-        print "Maximums to show"
+        #print "Maximums to show"
         #print maximums_to_show
-        print "Minimums to show"
+        #print "Minimums to show"
         #print minimums_to_show
 
         unique_peak_borders_mean_multiplicity = MathRoutines.mean_from_bins(bins[unique_peak_borders[0]: unique_peak_borders[1]+1],
@@ -143,7 +143,7 @@ class Jellyfish(Tool):
         general_stats += "Standard deviation of kmer multiplicity in first peak\t%.2f\n" % np.around(std_1, decimals=2)
         general_stats += "Variance coefficient of kmer multiplicity in first peak\t%.2f\n" % np.around(var_1,
                                                                                                        decimals=2)
-        general_stats += "Estimated genome size %i\n" % estimated_genome_size
+        general_stats += "Estimated genome size, bp %i\n" % estimated_genome_size
         with open("%s.histo.stats" % output_prefix, "w") as stat_fd:
             stat_fd.write(general_stats)
         print(general_stats)
@@ -263,7 +263,7 @@ class Jellyfish(Tool):
                 minimums_in_checked_area_idx.append(minimum_index)
 
         if len(peaks_in_checked_area_idx) > 1:
-            print "WARNING! Add      itional k-mer peaks were detected with multiplicity (%i, %i]" % (first_unique_peak_coverage,
+            print "WARNING! Additional k-mer peaks were detected with multiplicity (%i, %i]" % (first_unique_peak_coverage,
                                                                                                 max_checked_coverage)
 
         nearest_value_to_first_min_idx = MathRoutines.find_nearest_scalar(counts[local_maximums_idx[first_unique_peak_idx_idx]:],
