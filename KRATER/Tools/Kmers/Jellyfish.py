@@ -279,7 +279,6 @@ class Jellyfish(Tool):
         minimums_to_show = [(bins[i], counts[i]) for i in minimums_in_checked_area_idx]
 
         estimated_genome_size = 0
-        print minimums_to_show[0][0]
 
         for i in range(int(minimums_to_show[0][0]), len(counts)):
             estimated_genome_size += counts[i] * bins[i]
