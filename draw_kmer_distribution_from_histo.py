@@ -36,4 +36,4 @@ args = parser.parse_args()
 Jellyfish.draw_kmer_distribution(args.input, args.kmer_length, args.output_prefix, output_formats=args.output_formats,
                                  logbase=args.logbase, non_log_low_limit=args.low_limit,
                                  non_log_high_limit=args.high_limit,
-                                 draw_separated_pictures=args.draw_separated_picture) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
+                                 draw_separated_pictures=args.draw_separated_pictures) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
