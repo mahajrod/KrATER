@@ -150,6 +150,9 @@ class Jellyfish(Tool):
 
         max_bin = max(bins)
 
+        selected_counts = counts[non_log_low_limit-1:non_log_high_limit]
+        selected_bins = bins[non_log_low_limit-1:non_log_high_limit]
+
         if draw_separated_pictures:
             figure = plt.figure(1, figsize=(8, 8), dpi=300)
             subplot = plt.subplot(1, 1, 1)
@@ -165,9 +168,6 @@ class Jellyfish(Tool):
                 plt.savefig("%s.logscale.%s" % (output_prefix, extension))
 
             plt.close()
-
-            selected_counts = counts[non_log_low_limit-1:non_log_high_limit]
-            selected_bins = bins[non_log_low_limit-1:non_log_high_limit]
 
             figure = plt.figure(2, figsize=(8, 8), dpi=300)
             subplot = plt.subplot(1, 1, 1)
