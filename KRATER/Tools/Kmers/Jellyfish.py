@@ -53,7 +53,7 @@ class Jellyfish(Tool):
 
         self.execute(options, cmd="jellyfish stats")
 
-    def histo(self, in_file, out_file, bin_width=1, lower_count=1, upper_count=10000,
+    def histo(self, in_file, out_file, bin_width=1, lower_count=1, upper_count=10000000000,
               include_absent_kmers=False):
 
         if (lower_count is not None) and (upper_count is not None):
@@ -100,7 +100,7 @@ class Jellyfish(Tool):
 
     def draw_kmer_distribution(self, histo_file, kmer_length, output_prefix, output_formats=["svg", "png"],
                                logbase=10, non_log_low_limit=5, non_log_high_limit=100, order=3, mode="wrap",
-                               check_peaks_coef=10):
+                               check_peaks_coef=10, draw_separated_pictures=False):
         bins, counts = np.loadtxt(histo_file, unpack=True)
         maximums_to_show, minimums_to_show, \
             unique_peak_borders, number_of_distinct_kmers, \
@@ -149,37 +149,47 @@ class Jellyfish(Tool):
         print(general_stats)
 
         max_bin = max(bins)
-        figure = plt.figure(1, figsize=(8, 8), dpi=300)
-        subplot = plt.subplot(1, 1, 1)
-        plt.suptitle("Distribution of %i-mers" % kmer_length, fontweight='bold')
-        plt.plot(bins, counts)
-        plt.xlim(xmin=1, xmax=max_bin)
-        plt.xlabel("Multiplicity")
-        plt.ylabel("Number of distinct %s-mers" % kmer_length)
-        subplot.set_yscale('log', basey=logbase)
-        subplot.set_xscale('log', basex=logbase)
 
-        for extension in output_formats:
-            plt.savefig("%s.logscale.%s" % (output_prefix, extension))
+        if draw_separated_pictures:
+            figure = plt.figure(1, figsize=(8, 8), dpi=300)
+            subplot = plt.subplot(1, 1, 1)
+            plt.suptitle("Distribution of %i-mers" % kmer_length, fontweight='bold')
+            plt.plot(bins, counts)
+            plt.xlim(xmin=1, xmax=max_bin)
+            plt.xlabel("Multiplicity")
+            plt.ylabel("Number of distinct %s-mers" % kmer_length)
+            subplot.set_yscale('log', basey=logbase)
+            subplot.set_xscale('log', basex=logbase)
 
-        plt.close()
+            for extension in output_formats:
+                plt.savefig("%s.logscale.%s" % (output_prefix, extension))
 
-        selected_counts = counts[non_log_low_limit-1:non_log_high_limit]
-        selected_bins = bins[non_log_low_limit-1:non_log_high_limit]
+            plt.close()
 
-        figure = plt.figure(2, figsize=(8, 8), dpi=300)
-        subplot = plt.subplot(1, 1, 1)
-        plt.suptitle("Distribution of %s-mers" % kmer_length, fontweight='bold')
-        plt.plot(selected_bins, selected_counts)
+            selected_counts = counts[non_log_low_limit-1:non_log_high_limit]
+            selected_bins = bins[non_log_low_limit-1:non_log_high_limit]
 
-        plt.xlabel("Multiplicity")
-        plt.ylabel("Number of distinct %s-mers" % kmer_length)
-        plt.xlim(xmin=non_log_low_limit, xmax=non_log_high_limit)
+            figure = plt.figure(2, figsize=(8, 8), dpi=300)
+            subplot = plt.subplot(1, 1, 1)
+            plt.suptitle("Distribution of %s-mers" % kmer_length, fontweight='bold')
+            plt.plot(selected_bins, selected_counts)
 
-        for extension in output_formats:
-            plt.savefig("%s.no_logscale.%s" % (output_prefix, extension))
+            plt.xlabel("Multiplicity")
+            plt.ylabel("Number of distinct %s-mers" % kmer_length)
+            plt.xlim(xmin=non_log_low_limit, xmax=non_log_high_limit)
 
-        plt.close()
+            for extension in output_formats:
+                plt.savefig("%s.no_logscale.%s" % (output_prefix, extension))
+
+            plt.close()
+
+        size_in_gigabases = float(estimated_genome_size) / float(10 ^ 9)
+        size_in_megabases = float(estimated_genome_size) / float(10 ^ 6)
+        if size_in_gigabases > 0:
+            legend = "Genome size %.2f G" % size_in_gigabases
+        else:
+            legend = "Genome size %.2f M" % size_in_megabases
+
         for index in range(3, 5):
             figure = plt.figure(index, figsize=(6, 12), dpi=400)
             subplot_list = []
@@ -187,6 +197,8 @@ class Jellyfish(Tool):
                 subplot_list.append(plt.subplot(2, 1, i))
                 plt.suptitle("Distribution of %s-mers" % kmer_length, fontweight='bold', fontsize=13)
                 plt.plot(b, c)
+
+                plt.legend((legend, ), loc="upper right")
 
                 if index == 4:
                     for minimum in minimums_to_show:
