@@ -183,8 +183,8 @@ class Jellyfish(Tool):
 
             plt.close()
 
-        size_in_gigabases = float(estimated_genome_size) / float(10 ^ 9)
-        size_in_megabases = float(estimated_genome_size) / float(10 ^ 6)
+        size_in_gigabases = float(estimated_genome_size) / float(10 ** 9)
+        size_in_megabases = float(estimated_genome_size) / float(10 ** 6)
         if size_in_gigabases > 0:
             legend = "Genome size %.2f G" % size_in_gigabases
         else:
