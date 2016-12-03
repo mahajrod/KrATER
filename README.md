@@ -66,13 +66,17 @@ II. Installation
     
 III. RUN
 
-    1. If nput file/files is/are fastq:
+    1. If input file/files is/are fastq:
     
         Typical usage:
             draw_kmer_distribution_from_fastq.py -m 23  -t ${THREAD_NUMBER} -b -s 30G -e png -o ${OUTPUT_PREFIX} -i {COMMA_SEPARATED_LIST_OF_FASTQ_FILES} -w ${MINIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE}  -g ${MAXIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE}
         
         Parameter description:
-            
+        
+    2. If input file is jellyfish database
+        
+        Typical usage:
+            draw_kmer_distribution_from_jellyfish_database.py -i ${JELLYFISH_DATABASE}  -o ${OUTPUT_PREFIX} -w ${MINIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE} -g ${MAXIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE} -e png
         
     2. If input file is histogram file produced by Jellyfish:
     
