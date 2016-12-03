@@ -12,6 +12,7 @@ setup(name='KrATER',
       author_email='mahajrod@gmail.com',
       install_requires=['scipy', 'numpy', 'matplotlib'],
       long_description=open(join(dirname(__file__), 'README.md')).read(),
+      description='K-mer Analysis Tool ER',
       scripts=['draw_kmer_distribution_from_fastq.py',
                'draw_kmer_distribution_from_histo.py',
                'draw_kmer_distribution_from_jellyfish_database.py'])
