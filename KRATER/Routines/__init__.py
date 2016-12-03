@@ -1,4 +1,4 @@
-__author__ = 'mahajrod'
+__author__ = 'Sergei F. Kliver'
 
 from KRATER.Routines.Math import MathRoutines
 from KRATER.Routines.File import FileRoutines

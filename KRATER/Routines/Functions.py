@@ -1,4 +1,4 @@
-__author__ = 'mahajrod'
+__author__ = 'Sergei F. Kliver'
 import re
 import sys
 

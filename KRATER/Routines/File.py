@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-__author__ = 'mahajrod'
+__author__ = 'Sergei F. Kliver'
 
 import os
 from collections import Iterable, OrderedDict
