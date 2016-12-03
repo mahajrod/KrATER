@@ -5,9 +5,10 @@ from os.path import join, dirname
 
 
 setup(name='KrATER',
-      version='0.1',
+      version='0.12',
       packages=find_packages(),
       author='Sergei F. Kliver',
+      url='https://github.com/mahajrod/KRATER',
       author_email='mahajrod@gmail.com',
       install_requires=['scipy', 'numpy', 'matplotlib'],
       long_description=open(join(dirname(__file__), 'README.md')).read(),
