@@ -53,7 +53,7 @@ class Jellyfish(Tool):
 
         self.execute(options, cmd="jellyfish stats")
 
-    def histo(self, in_file, out_file, bin_width=1, lower_count=1, upper_count=10000000000,
+    def histo(self, in_file, out_file, bin_width=1, lower_count=1, upper_count=100000000,
               include_absent_kmers=False):
 
         if (lower_count is not None) and (upper_count is not None):

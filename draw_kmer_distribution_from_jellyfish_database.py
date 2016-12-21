@@ -47,7 +47,7 @@ kmer_file = "%s_%i_mer.kmer" % (args.output_prefix, args.kmer_length)
 histo_file = "%s_%i_mer.histo" % (args.output_prefix, args.kmer_length)
 picture_prefix = "%s_%i_mer_histogram" % (args.output_prefix, args.kmer_length)
 
-Jellyfish.histo(args.input, histo_file, upper_count=10000000000)
+Jellyfish.histo(args.input, histo_file, upper_count=100000000)
 Jellyfish.draw_kmer_distribution(histo_file, args.kmer_length, picture_prefix, output_formats=args.output_formats,
                                  logbase=args.logbase, non_log_low_limit=args.low_limit,
                                  non_log_high_limit=args.high_limit,
