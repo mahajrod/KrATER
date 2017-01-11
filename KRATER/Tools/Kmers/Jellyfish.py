@@ -185,12 +185,19 @@ class Jellyfish(Tool):
 
             plt.close()
 
+        size_in_terabases = float(estimated_genome_size) / float(10 ** 12)
         size_in_gigabases = float(estimated_genome_size) / float(10 ** 9)
         size_in_megabases = float(estimated_genome_size) / float(10 ** 6)
-        if size_in_gigabases > 0:
+        size_in_kilobases = float(estimated_genome_size) / float(10 ** 3)
+
+        if size_in_terabases > 1:
+            legend = "Genome size %.2f T" % size_in_terabases
+        elif size_in_gigabases > 1:
             legend = "Genome size %.2f G" % size_in_gigabases
-        else:
+        elif size_in_megabases > 1:
             legend = "Genome size %.2f M" % size_in_megabases
+        else:
+            legend = "Genome size %.2f K" % size_in_kilobases
 
         for index in range(3, 5):
             figure = plt.figure(index, figsize=(6, 12), dpi=400)
