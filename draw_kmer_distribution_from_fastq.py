@@ -52,6 +52,9 @@ parser.add_argument("-d", "--draw_separated_pictures", action="store_true", dest
                     default=False,
                     help="Draw additional separated pictures for double logarithmic and linear scales."
                          "Default - False")
+parser.add_argument("-u", "--point_number", action="store", dest="point_number", default=3, type=int,
+                    help="Number of values on both sides from each bin in histogram to count for detection "
+                         "of maximums and minimums. Rise if you histogram is noisy. Default: 3")
 #parser.add_argument("-d", "--draw_peaks_and_gaps", action="store_true", dest="draw_peaks_and_gaps",
 #                    help="Draw peaks and gaps")
 
@@ -84,5 +87,5 @@ Jellyfish.count(args.input if not args.add_rev_com else file_with_rev_com, base_
 Jellyfish.histo(base_file, histo_file, upper_count=100000000)
 Jellyfish.draw_kmer_distribution(histo_file, args.kmer_length, picture_prefix, output_formats=args.output_formats,
                                  logbase=args.logbase, non_log_low_limit=args.low_limit,
-                                 non_log_high_limit=args.high_limit,
+                                 non_log_high_limit=args.high_limit, order=args.point_number,
                                  draw_separated_pictures=args.draw_separated_pictures) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
