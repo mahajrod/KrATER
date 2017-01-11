@@ -261,7 +261,7 @@ class Jellyfish(Tool):
                 out_fd.write("%i\t%i\n" % (bins[idx], counts[idx]))
 
         first_unique_peak_idx_idx = 0 if local_maximums_idx[0] != 0 else 1
-        second_unique_peak_idx_idx = 1 if local_maximums_idx[1] != 1 else 2
+        second_unique_peak_idx_idx = 1 if local_maximums_idx[1] != 0 else 2
         first_unique_peak_coverage = bins[local_maximums_idx[first_unique_peak_idx_idx]]
         second_unique_peak_coverage = bins[local_maximums_idx[second_unique_peak_idx_idx]]
 
@@ -301,6 +301,8 @@ class Jellyfish(Tool):
             estimated_genome_size += counts[i] * bins[i]
 
         genome_coverage_peak = second_unique_peak_coverage if use_second_peak_for_genome_size_estimation else first_unique_peak_coverage
+
+        #print genome_coverage_peak
 
         estimated_genome_size = estimated_genome_size/genome_coverage_peak
 
