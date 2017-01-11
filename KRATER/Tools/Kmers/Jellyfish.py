@@ -100,7 +100,8 @@ class Jellyfish(Tool):
 
     def draw_kmer_distribution(self, histo_file, kmer_length, output_prefix, output_formats=["svg", "png"],
                                logbase=10, non_log_low_limit=5, non_log_high_limit=100, order=3, mode="wrap",
-                               check_peaks_coef=10, draw_separated_pictures=False):
+                               check_peaks_coef=10, draw_separated_pictures=False,
+                               use_second_peak_for_genome_size_estimation=False):
         bins, counts = np.loadtxt(histo_file, unpack=True)
         maximums_to_show, minimums_to_show, \
             unique_peak_borders, number_of_distinct_kmers, \
@@ -110,7 +111,8 @@ class Jellyfish(Tool):
                                                                              output_prefix,
                                                                              order=order,
                                                                              mode=mode,
-                                                                             check_peaks_coef=check_peaks_coef)
+                                                                             check_peaks_coef=check_peaks_coef,
+                                                                             use_second_peak_for_genome_size_estimation=use_second_peak_for_genome_size_estimation)
 
         unique_peak_width = unique_peak_borders[1] - unique_peak_borders[0] + 1
         #print unique_peak_borders
@@ -238,7 +240,8 @@ class Jellyfish(Tool):
         return local_minimums_idx, local_maximums_idx
 
     @staticmethod
-    def extract_parameters_from_histo(counts, bins, output_prefix, order=3, mode="wrap", check_peaks_coef=10):
+    def extract_parameters_from_histo(counts, bins, output_prefix, order=3, mode="wrap", check_peaks_coef=10,
+                                      use_second_peak_for_genome_size_estimation=False):
         """
         check_peaks_coef:
             histogram is checked for presence of additional peaks in range [first_unique_peak, check_peaks_coef*first_unique_peak]
@@ -258,7 +261,9 @@ class Jellyfish(Tool):
                 out_fd.write("%i\t%i\n" % (bins[idx], counts[idx]))
 
         first_unique_peak_idx_idx = 0 if local_maximums_idx[0] != 0 else 1
+        second_unique_peak_idx_idx = 1 if local_maximums_idx[1] != 1 else 2
         first_unique_peak_coverage = bins[local_maximums_idx[first_unique_peak_idx_idx]]
+        second_unique_peak_coverage = bins[local_maximums_idx[second_unique_peak_idx_idx]]
 
         max_checked_coverage = check_peaks_coef * first_unique_peak_coverage
         peaks_in_checked_area_idx = [local_maximums_idx[first_unique_peak_idx_idx]]
@@ -295,7 +300,9 @@ class Jellyfish(Tool):
         for i in range(int(minimums_to_show[0][0]), len(counts)):
             estimated_genome_size += counts[i] * bins[i]
 
-        estimated_genome_size = estimated_genome_size/first_unique_peak_coverage
+        genome_coverage_peak = second_unique_peak_coverage if use_second_peak_for_genome_size_estimation else first_unique_peak_coverage
+
+        estimated_genome_size = estimated_genome_size/genome_coverage_peak
 
         return maximums_to_show, \
                minimums_to_show, \

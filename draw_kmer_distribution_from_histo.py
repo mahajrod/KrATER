@@ -31,6 +31,8 @@ parser.add_argument("-d", "--draw_separated_pictures", action="store_true", dest
 parser.add_argument("-u", "--point_number", action="store", dest="point_number", default=3, type=int,
                     help="Number of values on both sides from each bin in histogram to count for detection "
                          "of maximums and minimums. Rise if you histogram is noisy. Default: 3")
+parser.add_argument("-z", "--use_second_peak", action="store_true", dest="use_second_peak", default=False,
+                    help="Use second peak from histogram for genome size estimation")
 #parser.add_argument("-d", "--draw_peaks_and_gaps", action="store_true", dest="draw_peaks_and_gaps",
 #                    help="Draw peaks and gaps")
 
@@ -39,4 +41,5 @@ args = parser.parse_args()
 Jellyfish.draw_kmer_distribution(args.input, args.kmer_length, args.output_prefix, output_formats=args.output_formats,
                                  logbase=args.logbase, non_log_low_limit=args.low_limit,
                                  non_log_high_limit=args.high_limit, order=args.point_number,
-                                 draw_separated_pictures=args.draw_separated_pictures) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
+                                 draw_separated_pictures=args.draw_separated_pictures,
+                                 use_second_peak_for_genome_size_estimation=args.use_second_peak) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
