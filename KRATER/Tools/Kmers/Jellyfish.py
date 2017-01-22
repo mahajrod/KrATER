@@ -145,7 +145,7 @@ class Jellyfish(Tool):
         general_stats += "Standard deviation of kmer multiplicity in first peak\t%.2f\n" % np.around(std_1, decimals=2)
         general_stats += "Variance coefficient of kmer multiplicity in first peak\t%.2f\n" % np.around(var_1,
                                                                                                        decimals=2)
-        general_stats += "Estimated genome size, bp\t%i\n" % estimated_genome_size
+        general_stats += "Estimated genome size, bp\t%s\n" % ("NA" if estimated_genome_size else str(estimated_genome_size))
         with open("%s.histo.stats" % output_prefix, "w") as stat_fd:
             stat_fd.write(general_stats)
         print(general_stats)
@@ -156,7 +156,7 @@ class Jellyfish(Tool):
         selected_bins = bins[non_log_low_limit-1:non_log_high_limit]
 
         if draw_separated_pictures:
-            figure = plt.figure(1, figsize=(8, 8), dpi=300)
+            figure = plt.figure(1, figsize=(5, 5), dpi=300)
             subplot = plt.subplot(1, 1, 1)
             plt.suptitle("Distribution of %i-mers" % kmer_length, fontweight='bold')
             plt.plot(bins, counts)
@@ -171,7 +171,7 @@ class Jellyfish(Tool):
 
             plt.close()
 
-            figure = plt.figure(2, figsize=(8, 8), dpi=300)
+            figure = plt.figure(2, figsize=(5, 5), dpi=300)
             subplot = plt.subplot(1, 1, 1)
             plt.suptitle("Distribution of %s-mers" % kmer_length, fontweight='bold')
             plt.plot(selected_bins, selected_counts)
@@ -179,28 +179,31 @@ class Jellyfish(Tool):
             plt.xlabel("Multiplicity")
             plt.ylabel("Number of distinct %s-mers" % kmer_length)
             plt.xlim(xmin=non_log_low_limit, xmax=non_log_high_limit)
+            plt.ylim(ymin=0)
 
             for extension in output_formats:
                 plt.savefig("%s.no_logscale.%s" % (output_prefix, extension))
 
             plt.close()
-
-        size_in_terabases = float(estimated_genome_size) / float(10 ** 12)
-        size_in_gigabases = float(estimated_genome_size) / float(10 ** 9)
-        size_in_megabases = float(estimated_genome_size) / float(10 ** 6)
-        size_in_kilobases = float(estimated_genome_size) / float(10 ** 3)
-
-        if size_in_terabases > 1:
-            legend = "Genome size %.2f T" % size_in_terabases
-        elif size_in_gigabases > 1:
-            legend = "Genome size %.2f G" % size_in_gigabases
-        elif size_in_megabases > 1:
-            legend = "Genome size %.2f M" % size_in_megabases
+        if estimated_genome_size is None:
+            legend = "NA"
         else:
-            legend = "Genome size %.2f K" % size_in_kilobases
+            size_in_terabases = float(estimated_genome_size) / float(10 ** 12)
+            size_in_gigabases = float(estimated_genome_size) / float(10 ** 9)
+            size_in_megabases = float(estimated_genome_size) / float(10 ** 6)
+            size_in_kilobases = float(estimated_genome_size) / float(10 ** 3)
+
+            if size_in_terabases > 1:
+                legend = "Genome size %.2f T" % size_in_terabases
+            elif size_in_gigabases > 1:
+                legend = "Genome size %.2f G" % size_in_gigabases
+            elif size_in_megabases > 1:
+                legend = "Genome size %.2f M" % size_in_megabases
+            else:
+                legend = "Genome size %.2f K" % size_in_kilobases
 
         for index in range(3, 5):
-            figure = plt.figure(index, figsize=(6, 12), dpi=400)
+            figure = plt.figure(index, figsize=(5, 10))
             subplot_list = []
             for i, b, c in zip([1, 2], [bins, selected_bins], [counts, selected_counts]):
                 subplot_list.append(plt.subplot(2, 1, i))
@@ -216,11 +219,14 @@ class Jellyfish(Tool):
                         plt.plot([maximum[0], maximum[0]], [0, maximum[1]], 'g--', lw=1)
 
                 plt.ylabel("Number of distinct %s-mers" % kmer_length, fontsize=13)
+
                 if i == 1:
                     subplot_list[0].set_yscale('log', basey=logbase)
                     subplot_list[0].set_xscale('log', basex=logbase)
                     plt.xlim(xmin=1, xmax=max_bin)
+                    plt.ylim(ymin=1)
                 elif i == 2:
+                    plt.ylim(ymin=0)
                     plt.xlim(xmin=non_log_low_limit, xmax=non_log_high_limit)
                     plt.xlabel("Multiplicity", fontsize=15)
 
@@ -303,15 +309,24 @@ class Jellyfish(Tool):
         minimums_to_show = [(bins[i], counts[i]) for i in minimums_in_checked_area_idx]
 
         estimated_genome_size = 0
-
-        for i in range(int(minimums_to_show[0][0]), len(counts)):
-            estimated_genome_size += counts[i] * bins[i]
+        """
+        print local_minimums_idx
+        print local_maximums_idx
+        print minimums_to_show
+        """
+        if minimums_to_show:
+            for i in range(int(minimums_to_show[0][0]), len(counts)):
+                estimated_genome_size += counts[i] * bins[i]
+        else:
+            print "WARNING: Minimum between error peak and unique peak was not found. " \
+                  "Estimation of genome size is impossible "
+            estimated_genome_size = None
 
         genome_coverage_peak = second_unique_peak_coverage if use_second_peak_for_genome_size_estimation else first_unique_peak_coverage
 
         # print genome_coverage_peak
 
-        estimated_genome_size = estimated_genome_size/genome_coverage_peak
+        estimated_genome_size = estimated_genome_size/genome_coverage_peak if estimated_genome_size else None
 
         return maximums_to_show, \
                minimums_to_show, \
