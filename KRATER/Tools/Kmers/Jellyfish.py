@@ -145,7 +145,7 @@ class Jellyfish(Tool):
         general_stats += "Standard deviation of kmer multiplicity in first peak\t%.2f\n" % np.around(std_1, decimals=2)
         general_stats += "Variance coefficient of kmer multiplicity in first peak\t%.2f\n" % np.around(var_1,
                                                                                                        decimals=2)
-        general_stats += "Estimated genome size, bp\t%s\n" % ("NA" if estimated_genome_size else str(estimated_genome_size))
+        general_stats += "Estimated genome size, bp\t%s\n" % ("NA" if estimated_genome_size is None else str(estimated_genome_size))
         with open("%s.histo.stats" % output_prefix, "w") as stat_fd:
             stat_fd.write(general_stats)
         print(general_stats)
