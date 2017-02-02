@@ -1,8 +1,5 @@
 # KrATER (K-mer Analysis Tool Easy to Run)
 
-0. Install required software
-    - Install jellyfish 2.x.x  from http://www.genome.umd.edu/jellyfish.html
-
 I. Requirements
 
     1. Python libraries:
@@ -14,14 +11,17 @@ I. Requirements
 
 II. Installation
 
-    1. Install requirements (not necessary if you going to install KrATER via pip)
-        - run following command for global installation
+    1. Install requirements 
+        - install jellyfish 2.x.x  from http://www.genome.umd.edu/jellyfish.html
+    
+        - install python libraries(not necessary if you going to install KrATER via pip)
+            - run following command for global installation
         
-            sudo pip install matplotlib numpy scipy 
+                sudo pip install matplotlib numpy scipy 
             
-        - or following command for local installation if you don't have root permissions
+            - or following command for local installation if you don't have root permissions
         
-            pip install --user matplotlib numpy scipy
+                pip install --user matplotlib numpy scipy
             
     2. Install KrATER
         Variant 1: install using pip
