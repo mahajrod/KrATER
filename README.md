@@ -1,4 +1,7 @@
-# KrATER (K-mer Analysis Tool ER)
+# KrATER (K-mer Analysis Tool Easy to Run)
+
+0. Install required software
+    - Install jellyfish 2.x.x  from http://www.genome.umd.edu/jellyfish.html
 
 I. Requirements
 
