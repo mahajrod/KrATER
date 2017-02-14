@@ -112,7 +112,10 @@ class Jellyfish(Tool):
 
         default_labels = map(lambda ind: "S%i" % ind, range(1, len(histo_file_list) + 1))
 
-        for histo_file, label in zip(histo_file_list, label_list if label_list else default_labels):
+        histo_file_listtt = [histo_file_list] if isinstance(histo_file_list, str) else histo_file_list
+        label_listtt = [label_list] if isinstance(label_list, str) else label_list
+
+        for histo_file, label in zip(histo_file_listtt, label_listtt if label_listtt else default_labels):
             bins, counts = np.loadtxt(histo_file, unpack=True)
             data_list.append((bins, counts))
 

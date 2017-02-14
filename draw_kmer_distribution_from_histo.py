@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("-i", "--input", action="store", dest="input", required=True, type=lambda s: s.split(","),
                     help="Comma-separated list of input files with data for histogram")
-parser.add_argument("-a", "--labels", action="store", dest="labels", required=True, type=lambda s: s.split(","),
+parser.add_argument("-a", "--labels", action="store", dest="labels", type=lambda s: s.split(","),
                     help="Comma-separated list of labels for input files")
 parser.add_argument("-o", "--output_prefix", action="store", dest="output_prefix", required=True,
                     help="Output prefix")
