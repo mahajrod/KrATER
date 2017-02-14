@@ -613,7 +613,7 @@ class SequenceRoutines():
 
         with open(output, "w") as out_fd:
             for record_id in accordance_dict:
-                print record_id, accordance_dict[record_id]
+                print(record_id, accordance_dict[record_id])
                 out_fd.write("%s\t%s\n" % (record_id, accordance_dict[record_id]))
 
         return accordance_dict

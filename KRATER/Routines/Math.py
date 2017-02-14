@@ -65,7 +65,7 @@ class MathRoutines:
         output_string = "Mean\t%f\nMedian\t%f\nStandard deviation\t%f\nVariation coefficient\t%f\n" \
                         % (mean, median, std, var_coeff)
         if verbose:
-            print output_string
+            print(output_string)
 
         if output_file:
             with open(output_file, "w") as out_fd:
@@ -138,7 +138,7 @@ class SmoothRoutines:
         try:
             window_size = np.abs(np.int(window_size))
             order = np.abs(np.int(order))
-        except ValueError, msg:
+        except ValueError:
             raise ValueError("window_size and order have to be of type int")
         if window_size % 2 != 1 or window_size < 1:
             raise TypeError("window_size size must be a positive odd number")

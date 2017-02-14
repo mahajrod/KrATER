@@ -8,8 +8,10 @@ from KRATER.Tools.Kmers import Jellyfish
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("-i", "--input", action="store", dest="input", required=True,
-                    help="Input file with data for histogram")
+parser.add_argument("-i", "--input", action="store", dest="input", required=True, type=lambda s: s.split(","),
+                    help="Comma-separated list of input files with data for histogram")
+parser.add_argument("-a", "--labels", action="store", dest="labels", required=True, type=lambda s: s.split(","),
+                    help="Comma-separated list of labels for input files")
 parser.add_argument("-o", "--output_prefix", action="store", dest="output_prefix", required=True,
                     help="Output prefix")
 parser.add_argument("-e", "--output_formats", action="store", dest="output_formats", type=lambda s: s.split(","),
@@ -39,7 +41,7 @@ parser.add_argument("-z", "--use_second_peak", action="store_true", dest="use_se
 args = parser.parse_args()
 
 Jellyfish.draw_kmer_distribution(args.input, args.kmer_length, args.output_prefix, output_formats=args.output_formats,
-                                 logbase=args.logbase, non_log_low_limit=args.low_limit,
+                                 logbase=args.logbase, non_log_low_limit=args.low_limit, label_list=args.labels,
                                  non_log_high_limit=args.high_limit, order=args.point_number,
                                  draw_separated_pictures=args.draw_separated_pictures,
                                  use_second_peak_for_genome_size_estimation=args.use_second_peak) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
