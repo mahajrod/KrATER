@@ -101,7 +101,7 @@ class Jellyfish(Tool):
     def draw_kmer_distribution(self, histo_file_list, kmer_length, output_prefix, label_list=None, output_formats=["svg", "png"],
                                logbase=10, non_log_low_limit=5, non_log_high_limit=100, order=3, mode="wrap",
                                check_peaks_coef=10, draw_separated_pictures=False,
-                               use_second_peak_for_genome_size_estimation=False):
+                               use_second_peak_for_genome_size_estimation=False, dont_show_genome_size_on_plot=False):
 
         data_list = []
         parameters_list = []
@@ -234,7 +234,7 @@ class Jellyfish(Tool):
                 for i, b, c in zip([1, 2], [bins, selected_bins], [counts, selected_counts]):
                     subplot_list.append(plt.subplot(2, 1, i))
                     plt.suptitle("Distribution of %s-mers" % kmer_length, fontweight='bold', fontsize=13)
-                    plt.plot(b, c, label=legend) if i == 1 else plt.plot(b, c)
+                    plt.plot(b, c, label=legend) if (i == 1) and (not dont_show_genome_size_on_plot) else plt.plot(b, c)
 
                     #plt.legend((legend, ), loc="upper right")
                     #plt.legend(loc="upper right")

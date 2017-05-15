@@ -57,6 +57,10 @@ parser.add_argument("-u", "--point_number", action="store", dest="point_number",
                          "of maximums and minimums. Rise if you histogram is noisy. Default: 3")
 parser.add_argument("-z", "--use_second_peak", action="store_true", dest="use_second_peak", default=False,
                     help="Use second peak from histogram for genome size estimation")
+parser.add_argument("--dont_show_genome_size_on_plot", action="store_true", dest="dont_show_genome_size_on_plot", default=False,
+                    help="Dont show genome size on plot. Default: False")
+parser.add_argument("--turn_on_timelog", action="store_true", dest="Turns on timelog.", default=False,
+                    help="Turn on timelog. Default: False")
 #parser.add_argument("-d", "--draw_peaks_and_gaps", action="store_true", dest="draw_peaks_and_gaps",
 #                    help="Draw peaks and gaps")
 
@@ -91,4 +95,5 @@ Jellyfish.draw_kmer_distribution(histo_file, args.kmer_length, picture_prefix, o
                                  logbase=args.logbase, non_log_low_limit=args.low_limit,
                                  non_log_high_limit=args.high_limit, order=args.point_number,
                                  use_second_peak_for_genome_size_estimation=args.use_second_peak,
-                                 draw_separated_pictures=args.draw_separated_pictures) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
+                                 draw_separated_pictures=args.draw_separated_pictures,
+                                 dont_show_genome_size_on_plot=args.dont_show_genome_size_on_plot) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
