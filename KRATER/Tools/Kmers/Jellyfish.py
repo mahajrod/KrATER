@@ -8,7 +8,7 @@ import matplotlib
 matplotlib.use('Agg')
 os.environ['MPLCONFIGDIR'] = '/tmp/'
 import matplotlib.pyplot as plt
-
+plt.ioff()
 from KRATER.Tools.Abstract import Tool
 from KRATER.Routines import MatplotlibRoutines, MathRoutines
 
@@ -356,7 +356,7 @@ class Jellyfish(Tool):
             for i in range(int(minimums_to_show[0][0]), len(counts)):
                 estimated_genome_size += counts[i] * bins[i]
         else:
-            print("WARNING: Minimum between error peak and unique peak was not found. " \
+            print("WARNING: Minimum between error peak and unique peak was not found. "
                   "Estimation of genome size is impossible ")
             estimated_genome_size = None
 

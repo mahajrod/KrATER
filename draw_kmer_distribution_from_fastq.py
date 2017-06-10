@@ -59,7 +59,7 @@ parser.add_argument("-z", "--use_second_peak", action="store_true", dest="use_se
                     help="Use second peak from histogram for genome size estimation")
 parser.add_argument("--dont_show_genome_size_on_plot", action="store_true", dest="dont_show_genome_size_on_plot", default=False,
                     help="Dont show genome size on plot. Default: False")
-parser.add_argument("--turn_on_timelog", action="store_true", dest="Turns on timelog.", default=False,
+parser.add_argument("--turn_on_timelog", action="store_true", dest="turn_on_timelog", default=False,
                     help="Turn on timelog. Default: False")
 #parser.add_argument("-d", "--draw_peaks_and_gaps", action="store_true", dest="draw_peaks_and_gaps",
 #                    help="Draw peaks and gaps")
@@ -85,7 +85,7 @@ histo_file = "%s_%i_mer.histo" % (args.output_prefix, args.kmer_length)
 picture_prefix = "%s_%i_mer_histogram" % (args.output_prefix, args.kmer_length)
 
 Jellyfish.threads = args.threads
-Jellyfish.timelog = "%s_%i_mer.jellyfish.time.log" % (args.output_prefix, args.kmer_length)
+Jellyfish.timelog = "%s_%i_mer.jellyfish.time.log" % (args.output_prefix, args.kmer_length) if args.turn_on_timelog else None
 Jellyfish.path = args.jellyfish_path if args.jellyfish_path else ""
 Jellyfish.count(args.input if not args.add_rev_com else file_with_rev_com, base_file,
                 kmer_length=args.kmer_length, hash_size=args.hash_size,
