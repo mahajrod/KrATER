@@ -10,7 +10,7 @@ os.environ['MPLCONFIGDIR'] = '/tmp/'
 import matplotlib.pyplot as plt
 plt.ioff()
 from KRATER.Tools.Abstract import Tool
-from KRATER.Routines import MatplotlibRoutines, MathRoutines
+from KRATER.Routines import MatplotlibRoutines, MathRoutines, FileRoutines
 
 
 class Jellyfish(Tool):
@@ -36,7 +36,19 @@ class Jellyfish(Tool):
         options += " -C" if count_both_strands else ""
         options += " -L %i" % lower_count if lower_count is not None else ""
         options += " -U %i" % upper_count if upper_count is not None else ""
-        options += " %s" % (" ".join(in_file) if (isinstance(in_file, list)) or (isinstance(in_file, tuple)) else in_file)
+
+        input_files = [in_file] if isinstance(in_file, list) else in_file
+        file_options = ""
+        for filename in input_files:
+            filetype = FileRoutines.detect_filetype_by_extension(filename)
+            if filetype == "bzip":
+                file_options += " <(bzcat %s)" % filename
+            elif filetype == "gz":
+                file_options += " <(zcat %s)" % filename
+            else:
+                file_options += " <(cat %s)" % filename
+
+        options += " %s" % file_options
 
         self.execute(options, cmd="jellyfish count")
 

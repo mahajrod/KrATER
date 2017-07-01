@@ -1,0 +1,42 @@
+Sample	NA12877
+Number of distinct kmers	6116640430
+Number of distinct kmers with errors	3727922178
+Fraction of distinct kmers with errors	0.609
+Total number of kmers	128149925593
+Total number of kmers with errors	4034341933
+Fraction of kmers with errors	0.031
+Kmer multiplicity at first minimum	9.0
+Kmer multiplicity at first maximum	42.0
+Width of first peak	58
+Mean kmer multiplicity in first peak	39.95
+Standard deviation of kmer multiplicity in first peak	10.14
+Variance coefficient of kmer multiplicity in first peak	0.25
+Estimated genome size, bp	2954592441.79
+Sample	NA12878
+Number of distinct kmers	5953596201
+Number of distinct kmers with errors	3574908302
+Fraction of distinct kmers with errors	0.600
+Total number of kmers	124138309111
+Total number of kmers with errors	3859001507
+Fraction of kmers with errors	0.031
+Kmer multiplicity at first minimum	9.0
+Kmer multiplicity at first maximum	39.0
+Width of first peak	56
+Mean kmer multiplicity in first peak	38.97
+Standard deviation of kmer multiplicity in first peak	8.72
+Variance coefficient of kmer multiplicity in first peak	0.22
+Estimated genome size, bp	3083570963.9
+Sample	NA12889
+Number of distinct kmers	7040435798
+Number of distinct kmers with errors	4649490502
+Fraction of distinct kmers with errors	0.660
+Total number of kmers	131732914466
+Total number of kmers with errors	5011088950
+Fraction of kmers with errors	0.038
+Kmer multiplicity at first minimum	9.0
+Kmer multiplicity at first maximum	43.0
+Width of first peak	59
+Mean kmer multiplicity in first peak	41.00
+Standard deviation of kmer multiplicity in first peak	10.34
+Variance coefficient of kmer multiplicity in first peak	0.25
+Estimated genome size, bp	2946424460.67

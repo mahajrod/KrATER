@@ -10,7 +10,9 @@ class FileRoutines():
         self.filetypes_dict = {"fasta": [".fa", ".fasta", ".fa", ".pep", ".cds"],
                                "fastq": [".fastq", ".fq"],
                                "genbank": [".gb", ".genbank"],
-                               "newick": [".nwk"]}
+                               "newick": [".nwk"],
+                               "bzip": [".bz2"],
+                               "gz": [".gz"]}
 
     @staticmethod
     def save_mkdir(dirname):
