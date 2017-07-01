@@ -57,7 +57,7 @@ class Jellyfish(Tool):
         options += " -L %i" % lower_count if lower_count is not None else ""
         options += " -U %i" % upper_count if upper_count is not None else ""
 
-        options += " %s" % file_options
+        # options += " %s" % file_options
 
         self.execute(options, cmd="%s | jellyfish count" % file_options)
 
