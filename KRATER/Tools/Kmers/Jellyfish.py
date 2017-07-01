@@ -49,6 +49,7 @@ class Jellyfish(Tool):
         elif filetypes_list[0] == "gz":
             file_options = "zcat %s" % " ".join(input_files)
 
+
         options = "-m %i" % kmer_length
         options += " -s %s" % hash_size
         options += " -t %i" % self.threads
