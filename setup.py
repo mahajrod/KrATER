@@ -5,7 +5,7 @@ from os.path import join, dirname
 
 
 setup(name='KrATER',
-      version='0.33',
+      version='0.34',
       packages=find_packages(),
       author='Sergei F. Kliver',
       url='https://github.com/mahajrod/KRATER',
