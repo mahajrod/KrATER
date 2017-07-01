@@ -29,6 +29,26 @@ class Jellyfish(Tool):
             if lower_count > upper_count:
                 raise ValueError("Upper limit for kmer counts is less than lower")
 
+        input_files = [in_file] if isinstance(in_file, str) else in_file
+        file_options = ""
+        filetypes_list = []
+        for filename in input_files:
+            filetype = FileRoutines.detect_filetype_by_extension(filename)
+            if filetype not in filetypes_list:
+                filetypes_list.append(filetype)
+
+        if len(filetypes_list) > 1:
+            raise ValueError("Mix of filetypes in input files: %s" % ",".join(filetypes_list))
+
+        if filetypes_list[0] == "fasta" or filetypes_list[0] == "fastq":
+            file_options = "cat %s" % " ".join(input_files)
+        elif filetypes_list[0] is None:
+            print("Warning!!! Type of input files was not recognized. Treating them as fasta...")
+        elif filetypes_list[0] == "bzip":
+            file_options = "bzcat %s" % " ".join(input_files)
+        elif filetypes_list[0] == "gz":
+            file_options = "zcat %s" % " ".join(input_files)
+
         options = "-m %i" % kmer_length
         options += " -s %s" % hash_size
         options += " -t %i" % self.threads
@@ -37,20 +57,9 @@ class Jellyfish(Tool):
         options += " -L %i" % lower_count if lower_count is not None else ""
         options += " -U %i" % upper_count if upper_count is not None else ""
 
-        input_files = [in_file] if isinstance(in_file, str) else in_file
-        file_options = ""
-        for filename in input_files:
-            filetype = FileRoutines.detect_filetype_by_extension(filename)
-            if filetype == "bzip":
-                file_options += " <(bzcat %s)" % filename
-            elif filetype == "gz":
-                file_options += " <(zcat %s)" % filename
-            else:
-                file_options += " <(cat %s)" % filename
-
         options += " %s" % file_options
 
-        self.execute(options, cmd="jellyfish count")
+        self.execute(options, cmd="%s | jellyfish count" % file_options)
 
     def stats(self, in_file, out_file, lower_count=None, upper_count=None):
 
