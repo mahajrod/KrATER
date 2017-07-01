@@ -37,7 +37,7 @@ class Jellyfish(Tool):
         options += " -L %i" % lower_count if lower_count is not None else ""
         options += " -U %i" % upper_count if upper_count is not None else ""
 
-        input_files = [in_file] if isinstance(in_file, list) else in_file
+        input_files = [in_file] if isinstance(in_file, str) else in_file
         file_options = ""
         for filename in input_files:
             filetype = FileRoutines.detect_filetype_by_extension(filename)
