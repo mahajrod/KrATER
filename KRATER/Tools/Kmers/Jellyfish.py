@@ -47,7 +47,7 @@ class Jellyfish(Tool):
         if len(filetypes_list) > 1:
             raise ValueError("Mix of filetypes in input files: %s" % ",".join(filetypes_list))
 
-        if filetypes_list[0] == "fasta" or filetypes_list[0] == "fastq" or filetypes_list[0] == "fq" or filetypes_list[0] is None:
+        if filetypes_list[0] == "fasta" or filetypes_list[0] == "fastq" or filetypes_list[0] is None:
             if filetypes_list[0] is None:
                 print("Warning!!! Type of input files was not recognized. Treating them as fasta...")
             cmd = "jellyfish count"
