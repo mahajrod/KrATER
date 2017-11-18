@@ -156,6 +156,8 @@ class Jellyfish(Tool):
 
         print("Scanning database...")
         self.safe_mkdir(splited_sorted_unique_output)
+        self.safe_mkdir(splited_output_dir)
+
         for filename in os.listdir(splited_input_dir):
             input_file = "%s/%s" % (splited_input_dir, filename)
             output_file = "%s/%s.kmer.counts" % (splited_output_dir, filename)
