@@ -167,7 +167,7 @@ class Jellyfish(Tool):
             options += " -s %s" % input_file
             options += " -o %s" % output_file
             options += " %s" % jf_database
-            options += " | awk -F'\\t' '{if ($2 > 0) print $0}' | tee %s | sort | uniq > %s" % (output_file,
+            options += " | awk '{if ($2 > 0) print $0}' | tee %s | sort | uniq > %s" % (output_file,
                                                                                                   output_sorted_unique_file)
 
             options_list.append(options)
