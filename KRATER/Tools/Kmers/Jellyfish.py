@@ -150,6 +150,7 @@ class Jellyfish(Tool):
                                splited_sorted_unique_output="splited_sorted_unique_output",
                                retain_intermediate_file=False, ):
         print("Splitting fasta file...")
+        """
         self.split_fasta(sequence_file, splited_input_dir, num_of_recs_per_file=1, num_of_files=None,
                          output_prefix="splited_fasta", parsing_mode=parsing_mode)
         options_list = []
@@ -167,12 +168,12 @@ class Jellyfish(Tool):
             options += " -s %s" % input_file
             options += " %s" % jf_database
             options += " | awk '{if ($2 > 0) print $0}' | tee %s | sort | uniq > %s" % (output_file,
-                                                                                                  output_sorted_unique_file)
+                                                                                        output_sorted_unique_file)
 
             options_list.append(options)
 
         self.parallel_execute(options_list, cmd="")
-
+        """
         print("Analyzing results...")
         with open(output_file, "w") as out_fd:
             out_fd.write("#record_id\tlength\tcovered_positions\tcovered_positions,%\t"
@@ -198,7 +199,7 @@ class Jellyfish(Tool):
                         uniq_covered_positions += 1
                         total_kmer_number += int(line.strip().split()[1])
 
-                seq_length = len(seq_record.seq)
+                seq_length = len(seq_record)
 
                 approximated_mean_coverage = float(total_kmer_number)/float(seq_length)
                 out_fd.write("%s\t%i\t%i\t%.2f\t%i\t%.2f\t%.2f\t%s\n" % (seq_record.id, seq_length, covered_positions,
