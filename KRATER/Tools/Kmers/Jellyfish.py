@@ -146,41 +146,47 @@ class Jellyfish(Tool):
             shutil.rmtree(splited_output_dir)
 
     def scan_for_contamination(self, sequence_file, jf_database, output_file, splited_input_dir="splited_fasta",
-                               parsing_mode="parse", splited_output_dir="splited_output",
+                               parsing_mode="parse",splited_full_output_dir="splited_full_output",
+                               splited_output_dir="splited_output",
                                splited_sorted_unique_output="splited_sorted_unique_output",
                                retain_intermediate_file=False, ):
         print("Splitting fasta file...")
-        """
+
         self.split_fasta(sequence_file, splited_input_dir, num_of_recs_per_file=1, num_of_files=None,
                          output_prefix="splited_fasta", parsing_mode=parsing_mode)
         options_list = []
 
         print("Scanning database...")
-        self.safe_mkdir(splited_sorted_unique_output)
         self.safe_mkdir(splited_output_dir)
+        self.safe_mkdir(splited_full_output_dir)
+        self.safe_mkdir(splited_sorted_unique_output)
 
         for filename in os.listdir(splited_input_dir):
             input_file = "%s/%s" % (splited_input_dir, filename)
             output_file = "%s/%s.kmer.counts" % (splited_output_dir, filename)
+            full_output_file = "%s/%s" % (splited_full_output_dir, filename)
             output_sorted_unique_file = "%s/%s.kmer.sorted.unique.counts" % (splited_sorted_unique_output, filename)
 
             options = "jellyfish query"
             options += " -s %s" % input_file
             options += " %s" % jf_database
-            options += " | awk '{if ($2 > 0) print $0}' | tee %s | sort | uniq > %s" % (output_file,
-                                                                                        output_sorted_unique_file)
+            options += " | tee %s | awk '{if ($2 > 0) print $0}' | tee %s | sort | uniq > %s" % (full_output_file,
+                                                                                                 output_file,
+                                                                                                 output_sorted_unique_file)
 
             options_list.append(options)
 
         self.parallel_execute(options_list, cmd="")
-        """
+
         print("Analyzing results...")
         with open(output_file, "w") as out_fd:
             out_fd.write("#record_id\tlength\tcovered_positions\tcovered_positions,%\t"
-                         "covered_unique_position\tcovered_unique_positions,%\tapproximated_mean_coverage\tdescription\n")
+                         "covered_unique_position\tcovered_unique_positions,%\t"
+                         "kmer_mean_coverage\tkmer_median_coverage\tdescription\n")
             for filename in os.listdir(splited_input_dir):
                 input_file = "%s/%s" % (splited_input_dir, filename)
                 output_file = "%s/%s.kmer.counts" % (splited_output_dir, filename)
+                full_output_file = "%s/%s" % (splited_full_output_dir, filename)
                 output_sorted_unique_file = "%s/%s.kmer.sorted.unique.counts" % (splited_sorted_unique_output, filename)
 
                 seq_record = self.get_first_record_from_file(input_file, format="fasta")
@@ -199,15 +205,17 @@ class Jellyfish(Tool):
                         uniq_covered_positions += 1
                         total_kmer_number += int(line.strip().split()[1])
 
-                seq_length = len(seq_record)
+                seq_length = len(seq_record.seq)
+                kmer_coverage = np.loadtxt(full_output_file, usecols=1)
+                mean_kmer_coverage = np.mean(kmer_coverage)
+                median_kmer_coverage = np.median(kmer_coverage)
 
-                approximated_mean_coverage = float(total_kmer_number)/float(seq_length)
-                out_fd.write("%s\t%i\t%i\t%.2f\t%i\t%.2f\t%.2f\t%s\n" % (seq_record.id, seq_length, covered_positions,
-                                                                   float(covered_positions)/float(seq_length),
-                                                                   uniq_covered_positions,
-                                                                   float(uniq_covered_positions)/float(seq_length),
-                                                                   approximated_mean_coverage,
-                                                                   seq_record.description))
+                out_fd.write("%s\t%i\t%i\t%.2f\t%i\t%.2f\t%.2f\t%.2f\t%s\n" % (seq_record.id, seq_length, covered_positions,
+                                                                               float(covered_positions)/float(seq_length),
+                                                                               uniq_covered_positions,
+                                                                               float(uniq_covered_positions)/float(seq_length),
+                                                                               mean_kmer_coverage, median_kmer_coverage,
+                                                                               seq_record.description))
 
         if not retain_intermediate_file:
             shutil.rmtree(splited_input_dir)
