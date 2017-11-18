@@ -149,10 +149,13 @@ class Jellyfish(Tool):
                                parsing_mode="parse", splited_output_dir="splited_output",
                                splited_sorted_unique_output="splited_sorted_unique_output",
                                retain_intermediate_file=False, ):
+        print("Splitting fasta file...")
         self.split_fasta(sequence_file, splited_input_dir, num_of_recs_per_file=1, num_of_files=None,
                          output_prefix="splited_fasta", parsing_mode=parsing_mode)
         options_list = []
 
+        print("Scanning database...")
+        self.safe_mkdir(splited_sorted_unique_output)
         for filename in os.listdir(splited_input_dir):
             input_file = "%s/%s" % (splited_input_dir, filename)
             output_file = "%s/%s.kmer.counts" % (splited_output_dir, filename)
@@ -169,6 +172,7 @@ class Jellyfish(Tool):
 
         self.parallel_execute(options_list, cmd="")
 
+        print("Analyzing results...")
         with open(output_file, "w") as out_fd:
             out_fd.write("#record_id\tlength\tcovered_positions\tcovered_positions,%\t"
                          "covered_unique_position\tcovered_unique_positions,%\tapproximated_mean_coverage\tdescription\n")
