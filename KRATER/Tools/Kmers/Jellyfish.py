@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 __author__ = 'Sergei F. Kliver'
 import os
+import shutil
 import numpy as np
 from scipy.signal import argrelextrema
 
@@ -108,6 +109,104 @@ class Jellyfish(Tool):
         options += " %s" % in_file
 
         self.execute(options, cmd="jellyfish dump")
+
+    def query(self, sequence_file, jf_database, output_file):
+
+        options = " -s %s" % sequence_file
+        options += " -o %s" % output_file
+        options += " %s" % jf_database
+
+        self.execute(options, cmd="jellyfish query")
+
+    def parallel_query(self, sequence_file, jf_database, output_file, splited_input_dir="splited_fasta",
+                       per_sequence_analysis=False, parsing_mode="parse", splited_output_dir="splited_output",
+                       retain_intermediate_file=False):
+
+        self.split_fasta(sequence_file, splited_input_dir, num_of_recs_per_file=1 if per_sequence_analysis else None,
+                         num_of_files=None if per_sequence_analysis else 5 * self.threads,
+                         output_prefix="splited_fasta", parsing_mode=parsing_mode)
+        options_list = []
+
+        for filename in os.listdir(splited_input_dir):
+            input_file = "%s/%s" % (splited_input_dir, filename)
+            output_file = "%s/%s.kmer.counts" % (splited_output_dir, filename)
+
+            options = " -s %s" % input_file
+            options += " -o %s" % output_file
+            options += " %s" % jf_database
+
+            options_list.append(options)
+
+        self.parallel_execute(options_list, cmd="jellyfish query")
+
+        os.system("cat %s/* > %s" %(splited_output_dir, output_file))
+
+        if not retain_intermediate_file:
+            shutil.rmtree(splited_input_dir)
+            shutil.rmtree(splited_output_dir)
+
+    def scan_for_contamination(self, sequence_file, jf_database, output_file, splited_input_dir="splited_fasta",
+                               parsing_mode="parse", splited_output_dir="splited_output",
+                               splited_sorted_unique_output="splited_sorted_unique_output",
+                               retain_intermediate_file=False, ):
+        self.split_fasta(sequence_file, splited_input_dir, num_of_recs_per_file=1, num_of_files=None,
+                         output_prefix="splited_fasta", parsing_mode=parsing_mode)
+        options_list = []
+
+        for filename in os.listdir(splited_input_dir):
+            input_file = "%s/%s" % (splited_input_dir, filename)
+            output_file = "%s/%s.kmer.counts" % (splited_output_dir, filename)
+            output_sorted_unique_file = "%s/%s.kmer.sorted.unique.counts" % (splited_sorted_unique_output, filename)
+
+            options = "jellyfish query"
+            options += " -s %s" % input_file
+            options += " -o %s" % output_file
+            options += " %s" % jf_database
+            options += " | awk -F'\\t' '{if ($2 > 0) print $0}' | tee %s | sorted | uniq > %s" % (output_file,
+                                                                                                  output_sorted_unique_file)
+
+            options_list.append(options)
+
+        self.parallel_execute(options_list, cmd="")
+
+        with open(output_file, "w") as out_fd:
+            out_fd.write("#record_id\tlength\tcovered_positions\tcovered_positions,%\t"
+                         "covered_unique_position\tcovered_unique_positions,%\tapproximated_mean_coverage\tdescription\n")
+            for filename in os.listdir(splited_input_dir):
+                input_file = "%s/%s" % (splited_input_dir, filename)
+                output_file = "%s/%s.kmer.counts" % (splited_output_dir, filename)
+                output_sorted_unique_file = "%s/%s.kmer.sorted.unique.counts" % (splited_sorted_unique_output, filename)
+
+                seq_record = self.get_first_record_from_file(input_file, format="fasta")
+
+                covered_positions = 0
+
+                with open(output_file, "r") as a_fd:
+                    for line in a_fd:
+                        covered_positions += 1
+
+                uniq_covered_positions = 0
+                total_kmer_number = 0
+
+                with open(output_sorted_unique_file, "r") as b_fd:
+                    for line in b_fd:
+                        uniq_covered_positions += 1
+                        total_kmer_number += int(line.strip().split()[1])
+
+                seq_length = len(seq_record.seq)
+
+                approximated_mean_coverage = float(total_kmer_number)/float(seq_length)
+                out_fd.write("%s\t%i\t%i\t%.2f\t%i\t%.2f\t%.2f\t%s\n" % (seq_record.id, seq_length, covered_positions,
+                                                                   float(covered_positions)/float(seq_length),
+                                                                   uniq_covered_positions,
+                                                                   float(uniq_covered_positions)/float(seq_length),
+                                                                   approximated_mean_coverage,
+                                                                   seq_record.description))
+
+        if not retain_intermediate_file:
+            shutil.rmtree(splited_input_dir)
+            shutil.rmtree(splited_output_dir)
+            shutil.rmtree(splited_sorted_unique_output)
 
     def get_kmer_list(self, in_file, out_prefix, kmer_length=23, hash_size=1000000, count_both_strands=False,
                       lower_count=None, upper_count=None):
