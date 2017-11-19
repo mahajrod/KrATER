@@ -145,11 +145,12 @@ class Jellyfish(Tool):
             shutil.rmtree(splited_input_dir)
             shutil.rmtree(splited_output_dir)
 
-    def scan_for_contamination(self, sequence_file, jf_database, output_file, splited_input_dir="splited_fasta",
+    def scan_for_contamination(self, sequence_file, jf_database, out_file, splited_input_dir="splited_fasta",
                                parsing_mode="parse",splited_full_output_dir="splited_full_output",
                                splited_output_dir="splited_output",
                                splited_sorted_unique_output="splited_sorted_unique_output",
                                retain_intermediate_file=False, ):
+        """
         print("Splitting fasta file...")
 
         self.split_fasta(sequence_file, splited_input_dir, num_of_recs_per_file=1, num_of_files=None,
@@ -177,9 +178,9 @@ class Jellyfish(Tool):
             options_list.append(options)
 
         self.parallel_execute(options_list, cmd="")
-
+        """
         print("Analyzing results...")
-        with open(output_file, "w") as out_fd:
+        with open(out_file, "w") as out_fd:
             out_fd.write("#record_id\tlength\tcovered_positions\tcovered_positions,%\t"
                          "covered_unique_position\tcovered_unique_positions,%\t"
                          "kmer_mean_coverage\tkmer_median_coverage\tdescription\n")
