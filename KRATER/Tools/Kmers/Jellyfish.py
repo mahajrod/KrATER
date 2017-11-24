@@ -150,7 +150,7 @@ class Jellyfish(Tool):
                                splited_output_dir="splited_output",
                                splited_sorted_unique_output="splited_sorted_unique_output",
                                retain_intermediate_file=False, ):
-        """
+
         print("Splitting fasta file...")
 
         self.split_fasta(sequence_file, splited_input_dir, num_of_recs_per_file=1, num_of_files=None,
@@ -178,7 +178,7 @@ class Jellyfish(Tool):
             options_list.append(options)
 
         self.parallel_execute(options_list, cmd="")
-        """
+
         print("Analyzing results...")
         with open(out_file, "w") as out_fd:
             out_fd.write("#record_id\tlength\tcovered_positions\tcovered_positions,%\t"
@@ -212,9 +212,9 @@ class Jellyfish(Tool):
                 median_kmer_coverage = np.median(kmer_coverage)
 
                 out_fd.write("%s\t%i\t%i\t%.2f\t%i\t%.2f\t%.2f\t%.2f\t%s\n" % (seq_record.id, seq_length, covered_positions,
-                                                                               float(covered_positions)/float(seq_length),
+                                                                               100*float(covered_positions)/float(seq_length),
                                                                                uniq_covered_positions,
-                                                                               float(uniq_covered_positions)/float(seq_length),
+                                                                               100*float(uniq_covered_positions)/float(seq_length),
                                                                                mean_kmer_coverage, median_kmer_coverage,
                                                                                seq_record.description))
 
