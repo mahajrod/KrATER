@@ -290,8 +290,8 @@ class Jellyfish(Tool):
 
             return record_id, record_length, covered_kmers, mean_kmer_coverage, median_kmer_coverage
 
-        results_list = process_pool.map(scan_for_contamination, record_dict.keys())
-
+        process_pool.map(scan_for_contamination, record_dict.keys())
+        results_list = []
         for record_id, record_length, covered_kmers, mean_kmer_coverage, median_kmer_coverage in results_list:
             covered_kmer_percent = float(covered_kmers)/float(record_length)
 
