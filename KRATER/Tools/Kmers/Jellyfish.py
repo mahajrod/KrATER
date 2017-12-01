@@ -15,6 +15,7 @@ plt.ioff()
 from KRATER.Tools.Abstract import Tool
 from KRATER.Routines import MatplotlibRoutines, MathRoutines, FileRoutines
 
+write_results_mutex = Lock()
 
 class Jellyfish(Tool):
     """
@@ -272,8 +273,6 @@ class Jellyfish(Tool):
         process_pool = mp.Pool(self.threads if threads is None else threads)
 
         print("Scanning database...")
-
-        write_results_mutex = Lock()
 
         def scan_for_contamination(record_id):
             output = "%s/%s.count" % (splited_full_output_dir, record_id)
