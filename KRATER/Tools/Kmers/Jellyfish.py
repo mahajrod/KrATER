@@ -278,7 +278,7 @@ class Jellyfish(Tool):
 
             with open(output, "w") as out_fd:
                 print "bbbbb"
-                for kmer in kmer_generator(record_dict[record_id]):
+                for kmer in kmer_generator(record_dict[record_id].seq):
                     print kmer
                     freq = jf_db_query[kmer]
                     out_fd.write("%s\t%i\n" % (kmer, freq))
