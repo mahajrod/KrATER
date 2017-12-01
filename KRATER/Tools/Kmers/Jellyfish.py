@@ -248,11 +248,12 @@ class Jellyfish(Tool):
                 yield mer
         """
 
+        """
         def kmer_generator(record):
             #jellyfish.MerDNA.k(kmer_length)
             for mer in jellyfish.string_canonicals(str(record.seq)):# jellyfish.string_mers(record.seq):
                 yield mer
-
+        """
         results_file = "%s.results" % output_prefix
         filtered_results_file = "%s.filtered.results" % output_prefix
 
@@ -278,7 +279,7 @@ class Jellyfish(Tool):
 
             with open(output, "w") as out_fd:
                 print "bbbbb"
-                for kmer in kmer_generator(record_dict[record_id].seq):
+                for kmer in jellyfish.string_canonicals(record_dict[record_id].seq):
                     print kmer
                     freq = jf_db_query[kmer]
                     out_fd.write("%s\t%i\n" % (kmer, freq))
