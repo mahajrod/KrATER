@@ -243,7 +243,9 @@ class Jellyfish(Tool):
             for i in range(0, record_length - kmer_length + 1):
                 print record.seq[i:i+kmer_length]
                 mer = jellyfish.MerDNA(str(record.seq[i:i+kmer_length]))
-                #mer.canonicalize()
+                mer.canonicalize()
+                print mer
+                print
                 yield mer
 
         results_file = "%s.results" % output_prefix
