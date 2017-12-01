@@ -279,7 +279,7 @@ class Jellyfish(Tool):
 
             with open(output, "w") as out_fd:
                 print "bbbbb"
-                for kmer in jellyfish.string_canonicals(record_dict[record_id].seq):
+                for kmer in jellyfish.string_canonicals(str(record_dict[record_id].seq)):
                     print kmer
                     freq = jf_db_query[kmer]
                     out_fd.write("%s\t%i\n" % (kmer, freq))
