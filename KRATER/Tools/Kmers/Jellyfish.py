@@ -250,7 +250,7 @@ class Jellyfish(Tool):
 
         def kmer_generator(record, kmer_length):
             jellyfish.MerDNA.k(kmer_length)
-            for mer in jellyfish.string_canonicals(record.seq):# jellyfish.string_mers(record.seq):
+            for mer in jellyfish.string_canonicals(str(record.seq)):# jellyfish.string_mers(record.seq):
                 yield mer
 
         results_file = "%s.results" % output_prefix
