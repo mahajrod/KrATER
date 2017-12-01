@@ -292,7 +292,7 @@ class Jellyfish(Tool):
         for record_id, record_length, covered_kmers, mean_kmer_coverage, median_kmer_coverage in results_list:
             covered_kmer_percent = float(covered_kmers)/float(record_length)
 
-            results_string = "%s\t%i\t%i\t%.2f\t%.2f\t%.2f%s\n" % (record_id, record_length, covered_kmers,
+            results_string = "%s\t%i\t%i\t%.2f\t%.2f\t%.2f\t%s\n" % (record_id, record_length, covered_kmers,
                                                                    covered_kmer_percent,
                                                                    mean_kmer_coverage, median_kmer_coverage,
                                                                    record_dict[record_id].description)
