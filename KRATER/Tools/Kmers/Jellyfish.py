@@ -259,7 +259,7 @@ class Jellyfish(Tool):
         results_fd.write(header)
         filtered_results_fd.write(header)
 
-        process_pool = mp.ProcessPool(self.threads if threads is None else threads, )
+        process_pool = mp.Pool(self.threads if threads is None else threads, )
 
         print("Scanning database...")
 
