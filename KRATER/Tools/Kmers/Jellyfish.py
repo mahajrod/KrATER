@@ -3,6 +3,7 @@ __author__ = 'Sergei F. Kliver'
 import os
 import shutil
 import numpy as np
+import multiprocessing as mp
 from scipy.signal import argrelextrema
 
 import matplotlib
@@ -222,6 +223,93 @@ class Jellyfish(Tool):
             shutil.rmtree(splited_input_dir)
             shutil.rmtree(splited_output_dir)
             shutil.rmtree(splited_sorted_unique_output)
+
+    def scan_for_contamination_jf_pb(self, sequence_file, jf_database, output_prefix,
+                                     parsing_mode="parse", splited_full_output_dir="splited_full_output",
+                                     threads=None, kmer_length=23,
+                                     min_covered_kmers_fraction=0.9, min_median_kmer_coverage=20):
+
+        import jellyfish
+
+        write_results_mutex = mp.Lock()
+
+        print("Parsing fasta file...")
+
+        record_dict = self.parse_seq_file(sequence_file, parsing_mode, format="fasta", index_file="tmp.idx")
+
+        self.safe_mkdir(splited_full_output_dir)
+
+        jf_db_query = jellyfish.QueryMerFile(jf_database)
+
+        """
+        def kmer_generator(record, kmer_length):
+            record_length = len(record.seq)
+            if record_length < kmer_length:
+                return
+            for i in range(0, record_length - kmer_length + 1):
+                mer = jellyfish.MerDNA(record.seq[i:i+kmer_length])
+                mer.canonicalize()
+                yield mer
+        """
+
+        def kmer_generator(record, kmer_length):
+            jellyfish.MerDNA.k(kmer_length)
+            for mer in jellyfish.string_canonicals(record.seq):# jellyfish.string_mers(record.seq):
+                yield mer
+
+        results_file = "%s.results" % output_prefix
+        filtered_results_file = "%s.filtered.results" % output_prefix
+
+        header = ("#record_id\tlength\tcovered_kmers\tcovered_kmers,%\t"
+                  "kmer_mean_coverage\tkmer_median_coverage\tdescription\n")
+
+        results_fd = open(results_file, "w")
+        filtered_results_fd = open(filtered_results_file, "w")
+        results_fd.write(header)
+        filtered_results_fd.write(header)
+
+        def scan_for_contamination(record_id):
+            output = "%s/%s.count" % (splited_full_output_dir, record_id)
+
+            record_length = len(record_dict[record_id].seq)
+            covered_kmers = 0
+            coverage_array = []
+
+            with open(output, "w") as out_fd:
+                for kmer in kmer_generator(record_dict[record_id], kmer_length):
+                    freq = jf_db_query[kmer]
+                    out_fd.write("%s\t%i\n" % (kmer, freq))
+                    if freq > 0:
+                        covered_kmers += 1
+                    coverage_array.append(freq)
+
+            coverage_array = np.array(coverage_array)
+            median_kmer_coverage = np.median(coverage_array)
+            mean_kmer_coverage = np.mean(coverage_array)
+            covered_kmer_percent = float(covered_kmers)/float(record_length)
+            write_results_mutex.acquire()
+            results_fd.write("%s\t%i\t%i\t%.2f\t%.2f\t%.2f%s\t" % (record_id, record_length, covered_kmers,
+                                                                   covered_kmer_percent,
+                                                                   mean_kmer_coverage, median_kmer_coverage,
+                                                                   record_dict[record_id].description))
+            if (covered_kmer_percent > min_covered_kmers_fraction) and (median_kmer_coverage > min_median_kmer_coverage):
+                filtered_results_fd.write("%s\t%i\t%i\t%.2f\t%.2f\t%.2f%s\t" % (record_id, record_length, covered_kmers,
+                                                                                covered_kmer_percent,
+                                                                                mean_kmer_coverage,
+                                                                                median_kmer_coverage,
+                                                                                record_dict[record_id].description))
+            write_results_mutex.release()
+
+        process_pool = mp.Pool(self.threads if threads is None else threads)
+
+        print("Scanning database...")
+        process_pool.map(scan_for_contamination, record_dict.keys())
+
+        if parsing_mode == "index_db":
+            os.remove("tmp.idx")
+
+        results_fd.close()
+        filtered_results_fd.close()
 
     def get_kmer_list(self, in_file, out_prefix, kmer_length=23, hash_size=1000000, count_both_strands=False,
                       lower_count=None, upper_count=None):
