@@ -3,7 +3,6 @@ __author__ = 'Sergei F. Kliver'
 import os
 import shutil
 import numpy as np
-from multiprocessing import Lock
 import pathos.multiprocessing as mp
 from scipy.signal import argrelextrema
 
