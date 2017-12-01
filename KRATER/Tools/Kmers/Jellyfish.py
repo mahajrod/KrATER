@@ -251,7 +251,7 @@ class Jellyfish(Tool):
         results_file = "%s.results" % output_prefix
         filtered_results_file = "%s.filtered.results" % output_prefix
 
-        header = ("#record_id\tlength\tcovered_kmers\tcovered_kmers,%\t"
+        header = ("#record_id\tlength\tcovered_kmers\tcovered_kmers,fraction\t"
                   "kmer_mean_coverage\tkmer_median_coverage\tdescription\n")
 
         results_fd = open(results_file, "w")
