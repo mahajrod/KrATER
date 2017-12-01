@@ -293,9 +293,9 @@ class Jellyfish(Tool):
             covered_kmer_percent = float(covered_kmers)/float(record_length)
 
             results_string = "%s\t%i\t%i\t%.2f\t%.2f\t%.2f\t%s\n" % (record_id, record_length, covered_kmers,
-                                                                   covered_kmer_percent,
-                                                                   mean_kmer_coverage, median_kmer_coverage,
-                                                                   record_dict[record_id].description)
+                                                                     covered_kmer_percent,
+                                                                     mean_kmer_coverage, median_kmer_coverage,
+                                                                     record_dict[record_id].description)
             results_fd.write(results_string)
             if (covered_kmer_percent > min_covered_kmers_fraction) and (median_kmer_coverage > min_median_kmer_coverage):
                 filtered_results_fd.write(results_string)
