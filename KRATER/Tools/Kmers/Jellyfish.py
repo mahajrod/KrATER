@@ -241,11 +241,11 @@ class Jellyfish(Tool):
             if record_length < kmer_length:
                 return
             for i in range(0, record_length - kmer_length + 1):
-                #print record.seq[i:i+kmer_length]
+                print record.seq[i:i+kmer_length]
                 mer = jellyfish.MerDNA(str(record.seq[i:i+kmer_length]))
                 mer.canonicalize()
-                #print mer
-                #print
+                print mer
+                print
                 yield mer
 
         results_file = "%s.results" % output_prefix
@@ -272,9 +272,9 @@ class Jellyfish(Tool):
             coverage_array = []
 
             with open(output, "w") as out_fd:
-                #print "bbbbb"
+                print "bbbbb"
                 for kmer in kmer_generator(record_dict[record_id], kmer_length):
-                    #print kmer
+                    print kmer
                     freq = jf_db_query[kmer]
                     out_fd.write("%s\t%i\n" % (kmer, freq))
                     if freq > 0:
