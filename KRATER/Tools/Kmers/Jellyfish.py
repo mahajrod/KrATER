@@ -3,7 +3,7 @@ __author__ = 'Sergei F. Kliver'
 import os
 import shutil
 import numpy as np
-import multiprocessing as mp
+import pathos.multiprocessing as mp
 from scipy.signal import argrelextrema
 
 import matplotlib
@@ -14,39 +14,6 @@ plt.ioff()
 from KRATER.Tools.Abstract import Tool
 from KRATER.Routines import MatplotlibRoutines, MathRoutines, FileRoutines
 
-write_results_mutex = mp.Lock()
-
-def scan_for_contamination(record_id):
-    output = "%s/%s.count" % (splited_full_output_dir, record_id)
-
-    record_length = len(record_dict[record_id].seq)
-    covered_kmers = 0
-    coverage_array = []
-
-    with open(output, "w") as out_fd:
-        for kmer in kmer_generator(record_dict[record_id], kmer_length):
-            freq = jf_db_query[kmer]
-            out_fd.write("%s\t%i\n" % (kmer, freq))
-            if freq > 0:
-                covered_kmers += 1
-            coverage_array.append(freq)
-
-    coverage_array = np.array(coverage_array)
-    median_kmer_coverage = np.median(coverage_array)
-    mean_kmer_coverage = np.mean(coverage_array)
-    covered_kmer_percent = float(covered_kmers)/float(record_length)
-    write_results_mutex.acquire()
-    results_fd.write("%s\t%i\t%i\t%.2f\t%.2f\t%.2f%s\t" % (record_id, record_length, covered_kmers,
-                                                           covered_kmer_percent,
-                                                           mean_kmer_coverage, median_kmer_coverage,
-                                                           record_dict[record_id].description))
-    if (covered_kmer_percent > min_covered_kmers_fraction) and (median_kmer_coverage > min_median_kmer_coverage):
-        filtered_results_fd.write("%s\t%i\t%i\t%.2f\t%.2f\t%.2f%s\t" % (record_id, record_length, covered_kmers,
-                                                                        covered_kmer_percent,
-                                                                        mean_kmer_coverage,
-                                                                        median_kmer_coverage,
-                                                                        record_dict[record_id].description))
-    write_results_mutex.release()
 
 class Jellyfish(Tool):
     """
@@ -304,6 +271,41 @@ class Jellyfish(Tool):
         process_pool = mp.Pool(self.threads if threads is None else threads)
 
         print("Scanning database...")
+
+        write_results_mutex = mp.Lock()
+
+        def scan_for_contamination(record_id):
+            output = "%s/%s.count" % (splited_full_output_dir, record_id)
+
+            record_length = len(record_dict[record_id].seq)
+            covered_kmers = 0
+            coverage_array = []
+
+            with open(output, "w") as out_fd:
+                for kmer in kmer_generator(record_dict[record_id], kmer_length):
+                    freq = jf_db_query[kmer]
+                    out_fd.write("%s\t%i\n" % (kmer, freq))
+                    if freq > 0:
+                        covered_kmers += 1
+                    coverage_array.append(freq)
+
+            coverage_array = np.array(coverage_array)
+            median_kmer_coverage = np.median(coverage_array)
+            mean_kmer_coverage = np.mean(coverage_array)
+            covered_kmer_percent = float(covered_kmers)/float(record_length)
+            write_results_mutex.acquire()
+            results_fd.write("%s\t%i\t%i\t%.2f\t%.2f\t%.2f%s\t" % (record_id, record_length, covered_kmers,
+                                                                   covered_kmer_percent,
+                                                                   mean_kmer_coverage, median_kmer_coverage,
+                                                                   record_dict[record_id].description))
+            if (covered_kmer_percent > min_covered_kmers_fraction) and (median_kmer_coverage > min_median_kmer_coverage):
+                filtered_results_fd.write("%s\t%i\t%i\t%.2f\t%.2f\t%.2f%s\t" % (record_id, record_length, covered_kmers,
+                                                                                covered_kmer_percent,
+                                                                                mean_kmer_coverage,
+                                                                                median_kmer_coverage,
+                                                                                record_dict[record_id].description))
+            write_results_mutex.release()
+
         process_pool.map(scan_for_contamination, record_dict.keys())
 
         if parsing_mode == "index_db":
