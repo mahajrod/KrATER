@@ -236,7 +236,6 @@ class Jellyfish(Tool):
 
         self.safe_mkdir(splited_full_output_dir)
 
-        jf_db_query = jellyfish.QueryMerFile(jf_database)
 
         """
         def kmer_generator(record, kmer_length):
@@ -269,7 +268,8 @@ class Jellyfish(Tool):
 
         print("Scanning database...")
 
-        def scan_for_contamination(record_id, jf_db_query):
+        def scan_for_contamination(record_id):
+            jf_db_query = jellyfish.QueryMerFile(jf_database)
             output = "%s/%s.count" % (splited_full_output_dir, record_id)
 
             record_length = len(record_dict[record_id].seq)
