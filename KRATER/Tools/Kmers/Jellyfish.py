@@ -264,13 +264,15 @@ class Jellyfish(Tool):
         print("Scanning database...")
 
         def scan_for_contamination(record_id):
+            print "cccc"
             jf_db_query = jellyfish.QueryMerFile(jf_database)
+            print "dddddddd"
             output = "%s/%s.count" % (splited_full_output_dir, record_id)
 
             record_length = len(record_dict[record_id].seq)
             covered_kmers = 0
             coverage_array = []
-
+            print "ffffffffffffffff"
             with open(output, "w") as out_fd:
                 print "bbbbb"
                 for kmer in kmer_generator(record_dict[record_id], kmer_length):
