@@ -15,8 +15,6 @@ plt.ioff()
 from KRATER.Tools.Abstract import Tool
 from KRATER.Routines import MatplotlibRoutines, MathRoutines, FileRoutines
 
-write_results_mutex = Lock()
-
 class Jellyfish(Tool):
     """
     Several subcommands are not implemented: query, qhisto, qdump, qmerge, cite
@@ -233,8 +231,6 @@ class Jellyfish(Tool):
 
         import jellyfish
 
-
-
         print("Parsing fasta file...")
 
         record_dict = self.parse_seq_file(sequence_file, parsing_mode, format="fasta", index_file="tmp.idx")
@@ -270,7 +266,7 @@ class Jellyfish(Tool):
         results_fd.write(header)
         filtered_results_fd.write(header)
 
-        process_pool = mp.Pool(self.threads if threads is None else threads)
+        process_pool = mp.Pool(self.threads if threads is None else threads, )
 
         print("Scanning database...")
 
@@ -292,21 +288,21 @@ class Jellyfish(Tool):
             coverage_array = np.array(coverage_array)
             median_kmer_coverage = np.median(coverage_array)
             mean_kmer_coverage = np.mean(coverage_array)
+
+            return record_id, record_length, covered_kmers, mean_kmer_coverage, median_kmer_coverage
+
+        results_list = process_pool.map(scan_for_contamination, record_dict.keys())
+
+        for record_id, record_length, covered_kmers, mean_kmer_coverage, median_kmer_coverage in results_list:
             covered_kmer_percent = float(covered_kmers)/float(record_length)
-            write_results_mutex.acquire()
-            results_fd.write("%s\t%i\t%i\t%.2f\t%.2f\t%.2f%s\t" % (record_id, record_length, covered_kmers,
+
+            results_string = "%s\t%i\t%i\t%.2f\t%.2f\t%.2f%s\n" % (record_id, record_length, covered_kmers,
                                                                    covered_kmer_percent,
                                                                    mean_kmer_coverage, median_kmer_coverage,
-                                                                   record_dict[record_id].description))
+                                                                   record_dict[record_id].description)
+            results_fd.write(results_string)
             if (covered_kmer_percent > min_covered_kmers_fraction) and (median_kmer_coverage > min_median_kmer_coverage):
-                filtered_results_fd.write("%s\t%i\t%i\t%.2f\t%.2f\t%.2f%s\t" % (record_id, record_length, covered_kmers,
-                                                                                covered_kmer_percent,
-                                                                                mean_kmer_coverage,
-                                                                                median_kmer_coverage,
-                                                                                record_dict[record_id].description))
-            write_results_mutex.release()
-
-        process_pool.map(scan_for_contamination, record_dict.keys())
+                filtered_results_fd.write(results_string)
 
         if parsing_mode == "index_db":
             os.remove("tmp.idx")
