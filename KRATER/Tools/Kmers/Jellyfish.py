@@ -269,7 +269,7 @@ class Jellyfish(Tool):
 
         print("Scanning database...")
 
-        def scan_for_contamination(record_id):
+        def scan_for_contamination(record_id, jf_db_query):
             output = "%s/%s.count" % (splited_full_output_dir, record_id)
 
             record_length = len(record_dict[record_id].seq)
@@ -290,7 +290,7 @@ class Jellyfish(Tool):
 
             return record_id, record_length, covered_kmers, mean_kmer_coverage, median_kmer_coverage
 
-        process_pool.map(scan_for_contamination, record_dict.keys())
+        process_pool.map(scan_for_contamination, record_dict.keys(), jf_db_query)
         results_list = []
         for record_id, record_length, covered_kmers, mean_kmer_coverage, median_kmer_coverage in results_list:
             covered_kmer_percent = float(covered_kmers)/float(record_length)
