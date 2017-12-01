@@ -277,7 +277,9 @@ class Jellyfish(Tool):
             coverage_array = []
 
             with open(output, "w") as out_fd:
+                print "bbbbb"
                 for kmer in kmer_generator(record_dict[record_id], kmer_length):
+                    print kmer
                     freq = jf_db_query[kmer]
                     out_fd.write("%s\t%i\n" % (kmer, freq))
                     if freq > 0:
