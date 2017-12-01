@@ -236,8 +236,6 @@ class Jellyfish(Tool):
 
         self.safe_mkdir(splited_full_output_dir)
 
-
-        """
         def kmer_generator(record, kmer_length):
             record_length = len(record.seq)
             if record_length < kmer_length:
@@ -246,14 +244,8 @@ class Jellyfish(Tool):
                 mer = jellyfish.MerDNA(record.seq[i:i+kmer_length])
                 mer.canonicalize()
                 yield mer
-        """
 
-        """
-        def kmer_generator(record):
-            #jellyfish.MerDNA.k(kmer_length)
-            for mer in jellyfish.string_canonicals(str(record.seq)):# jellyfish.string_mers(record.seq):
-                yield mer
-        """
+
         results_file = "%s.results" % output_prefix
         filtered_results_file = "%s.filtered.results" % output_prefix
 
@@ -279,7 +271,7 @@ class Jellyfish(Tool):
 
             with open(output, "w") as out_fd:
                 print "bbbbb"
-                for kmer in jellyfish.string_mers(str(record_dict[record_id].seq)):
+                for kmer in kmer_generator(record_dict[record_id], kmer_length):
                     print kmer
                     freq = jf_db_query[kmer]
                     out_fd.write("%s\t%i\n" % (kmer, freq))
