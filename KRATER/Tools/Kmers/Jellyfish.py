@@ -3,6 +3,7 @@ __author__ = 'Sergei F. Kliver'
 import os
 import shutil
 import numpy as np
+from multiprocessing import Lock
 import pathos.multiprocessing as mp
 from scipy.signal import argrelextrema
 
@@ -272,7 +273,7 @@ class Jellyfish(Tool):
 
         print("Scanning database...")
 
-        write_results_mutex = mp.Lock()
+        write_results_mutex = Lock()
 
         def scan_for_contamination(record_id):
             output = "%s/%s.count" % (splited_full_output_dir, record_id)
