@@ -17,7 +17,7 @@ parser.add_argument("-t", "--threads", action="store", dest="threads", type=int,
                     help="Number of threads to use. Default: 1")
 parser.add_argument("-k", "--kmer_length", action="store", dest="kmer_length", type=int, default=23,
                     help="K-mer length in database. Default: 23")
-parser.add_argument("-f", "--min_fraction_of_covered_kmers", action="store", dest="min_fraction_of_covered_kmer",
+parser.add_argument("-f", "--min_fraction_of_covered_kmers", action="store", dest="min_fraction_of_covered_kmers",
                     type=float, default=0.9,
                     help="Minimum fraction of covered k-mers to pass filtration. Default: 0.9")
 parser.add_argument("-m", "--min_median_kmer_coverage", action="store", dest="min_median_kmer_coverage",
