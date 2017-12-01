@@ -241,10 +241,10 @@ class Jellyfish(Tool):
             if record_length < kmer_length:
                 return
             for i in range(0, record_length - kmer_length + 1):
+                print record.seq[i:i+kmer_length]
                 mer = jellyfish.MerDNA(record.seq[i:i+kmer_length])
                 mer.canonicalize()
                 yield mer
-
 
         results_file = "%s.results" % output_prefix
         filtered_results_file = "%s.filtered.results" % output_prefix
