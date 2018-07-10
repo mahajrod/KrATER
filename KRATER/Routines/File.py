@@ -17,7 +17,7 @@ class FileRoutines:
                                "genbank": [".gb", ".genbank"],
                                "newick": [".nwk"],
                                "gz": [".gz"],
-                               "bzip": [".bz"]}
+                               "bzip": [".bz2"]}
 
     @staticmethod
     def metaopen(filename, flags):
