@@ -181,7 +181,7 @@ class Jellyfish(Tool):
 
         print("Analyzing results...")
         with open(out_file, "w") as out_fd:
-            out_fd.write("#record_id\tlength\tcovered_positions\tcovered_positions,%\t"
+            out_fd.write("#record_id\tkmer_number\tcovered_positions\tcovered_positions,%\t"
                          "covered_unique_position\tcovered_unique_positions,%\t"
                          "kmer_mean_coverage\tkmer_median_coverage\tdescription\n")
             for filename in os.listdir(splited_input_dir):
@@ -194,7 +194,7 @@ class Jellyfish(Tool):
 
                 covered_positions = 0
 
-                with open(full_output_file, "r") as a_fd:
+                with open(output_file, "r") as a_fd:
                     for line in a_fd:
                         covered_positions += 1
 
@@ -205,16 +205,18 @@ class Jellyfish(Tool):
                     for line in b_fd:
                         uniq_covered_positions += 1
                         total_kmer_number += int(line.strip().split()[1])
-
-                seq_length = len(seq_record.seq)
+                kmer_number  = 0
+                with open(full_output_file, "r") as a_fd:
+                    for line in a_fd:
+                        kmer_number += 1
                 kmer_coverage = np.loadtxt(full_output_file, usecols=1)
                 mean_kmer_coverage = np.mean(kmer_coverage)
                 median_kmer_coverage = np.median(kmer_coverage)
 
-                out_fd.write("%s\t%i\t%i\t%.2f\t%i\t%.2f\t%.2f\t%.2f\t%s\n" % (seq_record.id, seq_length, covered_positions,
-                                                                               100*float(covered_positions)/float(seq_length),
+                out_fd.write("%s\t%i\t%i\t%.2f\t%i\t%.2f\t%.2f\t%.2f\t%s\n" % (seq_record.id, kmer_number, covered_positions,
+                                                                               100*float(covered_positions)/float(kmer_number),
                                                                                uniq_covered_positions,
-                                                                               100*float(uniq_covered_positions)/float(seq_length),
+                                                                               100*float(uniq_covered_positions)/float(kmer_number),
                                                                                mean_kmer_coverage, median_kmer_coverage,
                                                                                seq_record.description))
 
