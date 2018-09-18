@@ -194,7 +194,7 @@ class Jellyfish(Tool):
 
                 covered_positions = 0
 
-                with open(output_file, "r") as a_fd:
+                with open(full_output_file, "r") as a_fd:
                     for line in a_fd:
                         covered_positions += 1
 
