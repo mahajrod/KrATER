@@ -27,7 +27,7 @@ AIndex.threads = args.threads
 AIndex.create_index_from_jf(args.jf_db,
                             args.kmer_length,
                             output_prefix=args.output_prefix,
-                            lower_count=2, upper_count=None,
+                            lower_count=1, upper_count=None,
                             forward_file=args.forward_file,
                             reverse_file=args.reverse_file,
                             filetype="fastq",

@@ -29,7 +29,7 @@ AIndex.threads = args.threads
 
 AIndex.create_index_from_fastq(args.forward_file, args.reverse_file,
                                args.kmer_length, args.output_prefix,
-                               lower_count=2, upper_count=None,
+                               lower_count=1, upper_count=None,
                                filetype="fastq",
                                create_aindex=True,
                                hash_size=args.hash_size)
