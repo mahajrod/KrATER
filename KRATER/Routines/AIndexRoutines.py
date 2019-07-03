@@ -3,7 +3,7 @@ __author__ = 'Sergei F. Kliver'
 import os
 import shutil
 import numpy as np
-import multiprocessing as mp
+import multiprocess as mp
 
 import matplotlib
 matplotlib.use('Agg')
