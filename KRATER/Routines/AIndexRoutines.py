@@ -3,7 +3,7 @@ __author__ = 'Sergei F. Kliver'
 import os
 import shutil
 import numpy as np
-import multiprocess as mp
+import multiprocessing as mp
 
 import matplotlib
 matplotlib.use('Agg')
@@ -48,13 +48,18 @@ class AIndexRoutines(Tool):
                             skip_reads=False if reads_file else True,
                             skip_aindex=False if reads_file else True)
 
-        def get_kmer_coverage(seq_id):
-            return (seq_id, [index[sequence_collection.records[seq_id][i:i + kmer_length]] \
-                             for i in xrange(sequence_collection.lengths.at[seq_id, "length"] - kmer_length + 1)])
+        def get_kmer_coverage(seq_tuple):
+            """
+
+            :param seq_tuple: (seq_id, sequence)
+            :return:
+            """
+            return (seq_tuple[0], [index[seq_tuple[1][i:i + kmer_length]] \
+                             for i in xrange(len(seq_tuple[1]) - kmer_length + 1)])
 
         process_pool = external_process_pool if external_process_pool else mp.Pool(threads if threads else self.threads)
 
-        results = process_pool.map(get_kmer_coverage, sequence_collection.scaffolds, chunksize=1)
+        results = process_pool.map(get_kmer_coverage, sequence_collection.sequence_tuple_generator(), chunksize=1)
 
         print("Analyzing results...")
         with open(output_file, "w") as out_fd:
