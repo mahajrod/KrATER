@@ -49,10 +49,14 @@ class AIndexRoutines(Tool):
                             skip_aindex=False if reads_file else True)
 
         results = []
+        counter = 1
         for seq_id in sequence_collection.scaffolds:
             #print sequence_collection.seq_lengths.at[seq_id, "length"]
             results.append((seq_id, [index[sequence_collection.records[seq_id][i:i + kmer_length]] \
                            for i in xrange(sequence_collection.seq_lengths.at[seq_id, "length"] - kmer_length + 1)]))
+            counter += 1
+            if counter % 1000 == 0:
+                print("%i sequences were handled..." % counter)
         """
         def get_kmer_coverage(seq_tuple):
             return (seq_tuple[0], [index[seq_tuple[1][i:i + kmer_length]] \
