@@ -50,9 +50,9 @@ class AIndexRoutines(Tool):
 
         results = []
         for seq_id in sequence_collection.scaffolds:
-            print sequence_collection.seq_lengths.at[seq_id, "length"]
-            results = (seq_id, [index[sequence_collection.records[seq_id][i:i + kmer_length]] \
-                             for i in xrange(sequence_collection.seq_lengths.at[seq_id, "length"] - kmer_length + 1)])
+            #print sequence_collection.seq_lengths.at[seq_id, "length"]
+            results.append((seq_id, [index[sequence_collection.records[seq_id][i:i + kmer_length]] \
+                           for i in xrange(sequence_collection.seq_lengths.at[seq_id, "length"] - kmer_length + 1)]))
         """
         def get_kmer_coverage(seq_tuple):
             return (seq_tuple[0], [index[seq_tuple[1][i:i + kmer_length]] \
