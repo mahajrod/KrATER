@@ -52,7 +52,7 @@ class AIndexRoutines(Tool):
         for seq_id in sequence_collection.scaffolds:
             print sequence_collection.seq_lengths.at[seq_id, "length"]
             results = (seq_id, [index[sequence_collection.records[seq_id][i:i + kmer_length]] \
-                             for i in xrange(int(sequence_collection.seq_lengths.at[seq_id, "length"]) - kmer_length + 1)])
+                             for i in xrange(sequence_collection.seq_lengths.at[seq_id, "length"] - kmer_length + 1)])
         """
         def get_kmer_coverage(seq_tuple):
             return (seq_tuple[0], [index[seq_tuple[1][i:i + kmer_length]] \
@@ -67,7 +67,7 @@ class AIndexRoutines(Tool):
             out_fd.write("#record_id\tkmer_number\tcovered_positions\tcovered_positions,%\t"
                          "kmer_mean_coverage\tkmer_median_coverage\tdescription\n")
             for seq_id, kmer_coverage_list in results:
-                kmer_number = int(sequence_collection.seq_lengths.at[seq_id, "length"])-kmer_length+1
+                kmer_number = sequence_collection.seq_lengths.at[seq_id, "length"]-kmer_length+1
                 covered_positions = kmer_number - kmer_coverage_list.count(0)
 
                 mean_kmer_coverage = np.mean(kmer_coverage_list)
