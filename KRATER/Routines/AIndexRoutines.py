@@ -49,7 +49,7 @@ class AIndexRoutines(Tool):
                             skip_aindex=False if reads_file else True)
 
         results = []
-        counter = 1
+        counter = 0
         for seq_id in sequence_collection.scaffolds:
             #print sequence_collection.seq_lengths.at[seq_id, "length"]
             results.append((seq_id, [index[sequence_collection.records[seq_id][i:i + kmer_length]] \
