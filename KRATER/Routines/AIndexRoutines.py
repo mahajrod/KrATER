@@ -17,10 +17,6 @@ from RouToolPa.Tools.Abstract import Tool
 from RouToolPa.Parsers.Sequence import CollectionSequence
 
 
-def get_kmer_coverage(seq_id):
-    return (seq_id, [index[sequence_collection.records[seq_id][i:i + kmer_length]] \
-            for i in xrange(sequence_collection.lengths.at[seq_id, "length"] - kmer_length + 1)])
-
 class AIndexRoutines(Tool):
 
     def __init__(self, path="", max_threads=4):
@@ -51,6 +47,10 @@ class AIndexRoutines(Tool):
         index = load_aindex(index_settings,
                             skip_reads=False if reads_file else True,
                             skip_aindex=False if reads_file else True)
+
+        def get_kmer_coverage(seq_id):
+            return (seq_id, [index[sequence_collection.records[seq_id][i:i + kmer_length]] \
+                             for i in xrange(sequence_collection.lengths.at[seq_id, "length"] - kmer_length + 1)])
 
         process_pool = external_process_pool if external_process_pool else mp.Pool(threads if threads else self.threads)
 
