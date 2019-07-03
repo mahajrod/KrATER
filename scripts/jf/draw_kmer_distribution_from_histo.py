@@ -3,7 +3,7 @@ __author__ = 'Sergei F. Kliver'
 #import os
 import argparse
 
-from KRATER.Tools.Kmers import Jellyfish
+from KRATER.Routines import JellyfishRoutines
 
 
 parser = argparse.ArgumentParser()
@@ -42,9 +42,15 @@ parser.add_argument("--dont_show_genome_size_on_plot", action="store_true", dest
 
 args = parser.parse_args()
 
-Jellyfish.draw_kmer_distribution(args.input, args.kmer_length, args.output_prefix, output_formats=args.output_formats,
-                                 logbase=args.logbase, non_log_low_limit=args.low_limit, label_list=args.labels,
-                                 non_log_high_limit=args.high_limit, order=args.point_number,
-                                 draw_separated_pictures=args.draw_separated_pictures,
-                                 use_second_peak_for_genome_size_estimation=args.use_second_peak,
-                                 dont_show_genome_size_on_plot=args.dont_show_genome_size_on_plot) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
+JellyfishRoutines.draw_kmer_distribution(args.input,
+                                         args.kmer_length,
+                                         args.output_prefix,
+                                         output_formats=args.output_formats,
+                                         logbase=args.logbase,
+                                         non_log_low_limit=args.low_limit,
+                                         label_list=args.labels,
+                                         non_log_high_limit=args.high_limit,
+                                         order=args.point_number,
+                                         draw_separated_pictures=args.draw_separated_pictures,
+                                         use_second_peak_for_genome_size_estimation=args.use_second_peak,
+                                         dont_show_genome_size_on_plot=args.dont_show_genome_size_on_plot) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)

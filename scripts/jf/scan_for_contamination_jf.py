@@ -3,7 +3,7 @@ __author__ = 'Sergei F. Kliver'
 #import os
 import argparse
 
-from KRATER.Tools.Kmers import Jellyfish
+from KRATER.Routines import JellyfishRoutines
 
 
 parser = argparse.ArgumentParser()
@@ -21,8 +21,8 @@ parser.add_argument("-t", "--threads", action="store", dest="threads", type=int,
 
 args = parser.parse_args()
 
-Jellyfish.threads = args.threads
-Jellyfish.scan_for_contamination(args.input, args.jf_db, args.output, splited_input_dir="splited_fasta",
-                                 parsing_mode="parse", splited_output_dir="splited_output",
-                                 splited_sorted_unique_output="splited_sorted_unique_output",
-                                 retain_intermediate_file=args.retain_intermediate_files)
+JellyfishRoutines.threads = args.threads
+JellyfishRoutines.scan_for_contamination(args.input, args.jf_db, args.output, splited_input_dir="splited_fasta",
+                                         parsing_mode="parse", splited_output_dir="splited_output",
+                                         splited_sorted_unique_output="splited_sorted_unique_output",
+                                         retain_intermediate_file=args.retain_intermediate_files)

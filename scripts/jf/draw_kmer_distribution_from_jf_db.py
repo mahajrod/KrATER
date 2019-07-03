@@ -4,13 +4,8 @@ __author__ = 'Sergei F. Kliver'
 import os
 import argparse
 
-from Bio import SeqIO
-
-from KRATER.Routines.Sequence import rev_com_generator
-from KRATER.Routines.File import make_list_of_path_to_files
-
-from KRATER.Tools.Kmers import Jellyfish
-
+from RouToolPa.Tools.Kmers import Jellyfish
+from KRATER.Routines import JellyfishRoutines
 
 parser = argparse.ArgumentParser()
 
@@ -57,9 +52,14 @@ picture_prefix = "%s_%i_mer_histogram" % (args.output_prefix, args.kmer_length)
 
 Jellyfish.histo(args.input, histo_file, upper_count=100000000)
 
-Jellyfish.draw_kmer_distribution(histo_file, args.kmer_length, picture_prefix, output_formats=args.output_formats,
-                                 logbase=args.logbase, non_log_low_limit=args.low_limit,
-                                 non_log_high_limit=args.high_limit, order=args.point_number,
-                                 use_second_peak_for_genome_size_estimation=args.use_second_peak,
-                                 draw_separated_pictures=args.draw_separated_pictures,
-                                 dont_show_genome_size_on_plot=args.dont_show_genome_size_on_plot) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
+JellyfishRoutines.draw_kmer_distribution(histo_file,
+                                         args.kmer_length,
+                                         picture_prefix,
+                                         output_formats=args.output_formats,
+                                         logbase=args.logbase,
+                                         non_log_low_limit=args.low_limit,
+                                         non_log_high_limit=args.high_limit,
+                                         order=args.point_number,
+                                         use_second_peak_for_genome_size_estimation=args.use_second_peak,
+                                         draw_separated_pictures=args.draw_separated_pictures,
+                                         dont_show_genome_size_on_plot=args.dont_show_genome_size_on_plot) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)

@@ -6,11 +6,10 @@ import argparse
 
 from Bio import SeqIO
 
-from KRATER.Routines.Sequence import rev_com_generator
-from KRATER.Routines.File import make_list_of_path_to_files
+from RouToolPa.Routines.Sequence import rev_com_generator
+from RouToolPa.Tools.Kmers import Jellyfish
 
-from KRATER.Tools.Kmers import Jellyfish
-
+from KRATER.Routines import JellyfishRoutines
 
 parser = argparse.ArgumentParser()
 
@@ -66,7 +65,7 @@ parser.add_argument("--turn_on_timelog", action="store_true", dest="turn_on_time
 
 args = parser.parse_args()
 
-args.input = make_list_of_path_to_files(args.input)
+args.input = Jellyfish.make_list_of_path_to_files(args.input)
 if args.count_both_strands and args.add_rev_com:
     raise ValueError("Options -b/--count_both_strands and -r/--add_reverse_complement are not compatible")
 
@@ -91,9 +90,10 @@ Jellyfish.count(args.input if not args.add_rev_com else file_with_rev_com, base_
                 kmer_length=args.kmer_length, hash_size=args.hash_size,
                 count_both_strands=args.count_both_strands)
 Jellyfish.histo(base_file, histo_file, upper_count=100000000)
-Jellyfish.draw_kmer_distribution(histo_file, args.kmer_length, picture_prefix, output_formats=args.output_formats,
-                                 logbase=args.logbase, non_log_low_limit=args.low_limit,
-                                 non_log_high_limit=args.high_limit, order=args.point_number,
-                                 use_second_peak_for_genome_size_estimation=args.use_second_peak,
-                                 draw_separated_pictures=args.draw_separated_pictures,
-                                 dont_show_genome_size_on_plot=args.dont_show_genome_size_on_plot) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
+JellyfishRoutines.draw_kmer_distribution(histo_file, args.kmer_length, picture_prefix,
+                                         output_formats=args.output_formats,
+                                         logbase=args.logbase, non_log_low_limit=args.low_limit,
+                                         non_log_high_limit=args.high_limit, order=args.point_number,
+                                         use_second_peak_for_genome_size_estimation=args.use_second_peak,
+                                         draw_separated_pictures=args.draw_separated_pictures,
+                                         dont_show_genome_size_on_plot=args.dont_show_genome_size_on_plot) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
