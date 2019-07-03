@@ -13,6 +13,7 @@ parser.add_argument("-s", "--sequences", action="store", dest="seqs", required=T
 parser.add_argument("-i", "--index_prefix", action="store", dest="index_prefix", required=True,
                     help="Index prefix")
 parser.add_argument("-k", "--kmer_length", action="store", dest="kmer_len", required=True,
+                    type=int,
                     help="Kmer length used for index creation")
 parser.add_argument("-o", "--output", action="store", dest="output", required=True,
                     help="Output file")
