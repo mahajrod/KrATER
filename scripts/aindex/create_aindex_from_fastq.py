@@ -22,6 +22,10 @@ parser.add_argument("-s", "--hash_size", action="store", dest="hash_size", type=
                     "S=Sum(L). Default - 1000000")
 parser.add_argument("-t", "--threads", action="store", dest="threads", type=int, default=1,
                     help="Number of threads. Default - 1")
+parser.add_argument("-l", "--min_kmer_cov", action="store", dest="min_kmer_coverage", type=int, default=1,
+                    help="Minimum coverage of kmers to include. Default - 1(all)")
+parser.add_argument("-x", "--max_kmer_cov", action="store", dest="max_kmer_coverage", type=int, default=None,
+                    help="Maximum coverage of kmers to include. Default - not set(all)")
 
 args = parser.parse_args()
 
@@ -29,7 +33,8 @@ AIndex.threads = args.threads
 
 AIndex.create_index_from_fastq(args.forward_file, args.reverse_file,
                                args.kmer_length, args.output_prefix,
-                               lower_count=1, upper_count=None,
+                               lower_count=args.min_kmer_coverage,
+                               upper_count=args.max_kmer_coverage,
                                filetype="fastq",
                                create_aindex=True,
                                hash_size=args.hash_size)
