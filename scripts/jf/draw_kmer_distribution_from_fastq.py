@@ -76,15 +76,16 @@ if args.add_rev_com:
     args.output_prefix += "_with_rev_com"
     os.remove("temp_index.idx")
 
-base_file = "%s_%i_mer.jf" % (args.output_prefix, args.kmer_length)
-kmer_table_file = "%s_%i_mer.counts" % (args.output_prefix, args.kmer_length)
-kmer_file = "%s_%i_mer.kmer" % (args.output_prefix, args.kmer_length)
+output_prefix = "%s.k%i" % (args.output_prefix, args.kmer_length)
+base_file = "%s.jf" % output_prefix
+kmer_table_file = "%s.counts" % output_prefix
+kmer_file = "%s.kmer" % output_prefix
 
-histo_file = "%s_%i_mer.histo" % (args.output_prefix, args.kmer_length)
-picture_prefix = "%s_%i_mer_histogram" % (args.output_prefix, args.kmer_length)
+histo_file = "%sr.histo" % output_prefix
+picture_prefix = "%s.histogram" % output_prefix
 
 Jellyfish.threads = args.threads
-Jellyfish.timelog = "%s_%i_mer.jellyfish.time.log" % (args.output_prefix, args.kmer_length) if args.turn_on_timelog else None
+Jellyfish.timelog = "%s.jellyfish.time.log" % output_prefix if args.turn_on_timelog else None
 Jellyfish.path = args.jellyfish_path if args.jellyfish_path else ""
 Jellyfish.count(args.input if not args.add_rev_com else file_with_rev_com, base_file,
                 kmer_length=args.kmer_length, hash_size=args.hash_size,
