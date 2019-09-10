@@ -7,7 +7,7 @@ import multiprocessing as mp
 
 import matplotlib
 matplotlib.use('Agg')
-os.environ['MPLCONFIGDIR'] = '/tmp/'
+os.environ['MPLCONFIGDIR'] = '/home/akomissarov/sfk/temp/'
 import matplotlib.pyplot as plt
 plt.ioff()
 
