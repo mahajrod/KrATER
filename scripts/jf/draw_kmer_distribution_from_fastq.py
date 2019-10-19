@@ -60,6 +60,8 @@ parser.add_argument("--dont_show_genome_size_on_plot", action="store_true", dest
                     help="Dont show genome size on plot. Default: False")
 parser.add_argument("--turn_on_timelog", action="store_true", dest="turn_on_timelog", default=False,
                     help="Turn on timelog. Default: False")
+parser.add_argument("--generators", action="store", dest="generators",
+                    help="File with commands for fastq generators. Default: None")
 #parser.add_argument("-d", "--draw_peaks_and_gaps", action="store_true", dest="draw_peaks_and_gaps",
 #                    help="Draw peaks and gaps")
 
@@ -89,7 +91,8 @@ Jellyfish.timelog = "%s.jellyfish.time.log" % output_prefix if args.turn_on_time
 Jellyfish.path = args.jellyfish_path if args.jellyfish_path else ""
 Jellyfish.count(args.input if not args.add_rev_com else file_with_rev_com, base_file,
                 kmer_length=args.kmer_length, hash_size=args.hash_size,
-                count_both_strands=args.count_both_strands)
+                count_both_strands=args.count_both_strands,
+                generators=args.generators)
 Jellyfish.histo(base_file, histo_file, upper_count=100000000)
 JellyfishRoutines.draw_kmer_distribution(histo_file, args.kmer_length, picture_prefix,
                                          output_formats=args.output_formats,
