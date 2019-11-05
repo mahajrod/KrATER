@@ -7,6 +7,8 @@ I. Requirements
         Numpy
         Scipy
         
+        RouToolPa (https://github.com/mahajrod/RouToolPa)
+        
     2. Jellyfish 2
 
 II. Installation
@@ -22,9 +24,25 @@ II. Installation
             - or following command for local installation if you don't have root permissions
         
                 pip install --user matplotlib numpy scipy
+        
+        - install RouToolPa
+            Get RouToolPa
+                git clone https://github.com/mahajrod/routoolpa
+        
+            Add following strings to ~/.profile and ~/.bashrc (create files if absent). Don't forget to replace <ROUTOOLPA_DIR> with actual path
+            
+                PYTHONPATH=${PYTHONPATH}:<ROUTOOLPA_DIR>
+                PATH=${PATH}:<ROUTOOLPA_DIR>
+                export PYTHONPATH
+                export PATH
+                
+            Run in terminal
+                source ~/.profile
+        
             
     2. Install KrATER
-        Variant 1: install using pip
+        Use variant 3 to install newest version of KrATER
+        Variant 1: install using pip (old version)
         
            - run following command for global installation
            
