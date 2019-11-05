@@ -11,7 +11,10 @@ os.environ['MPLCONFIGDIR'] = '/tmp/'
 import matplotlib.pyplot as plt
 plt.ioff()
 
-from aindex import *
+try:
+    from aindex import *
+except:
+    print("WARNING!!! aindex package was not found! Related code will not work")
 
 from RouToolPa.Tools.Abstract import Tool
 from RouToolPa.Parsers.Sequence import CollectionSequence
