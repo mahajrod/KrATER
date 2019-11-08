@@ -1,7 +1,7 @@
 __author__ = 'Sergei F. Kliver'
-
+import os
 from setuptools import setup, find_packages
-from os.path import join, dirname
+
 
 def get_list_of_files(list_of_dirs_and_files, expression=None, recursive=True):
     file_list = []
@@ -29,14 +29,14 @@ def get_list_of_files(list_of_dirs_and_files, expression=None, recursive=True):
 
 
 setup(name='KrATER',
-      version='2.0b',
+      version='2.1b',
       packages=find_packages(),
       author='Sergei F. Kliver',
       url='https://github.com/mahajrod/KRATER',
       author_email='mahajrod@gmail.com',
       scripts=get_list_of_files("scripts/"),
-      install_requires=['scipy', 'numpy', 'matplotlib', 'biopython', 'RouToolPa'],
-      long_description=open(join(dirname(__file__), 'README.md')).read())
+      install_requires=['scipy', 'numpy', 'matplotlib', 'biopython', 'routoolpa'],
+      long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read())
       #scripts=['draw_kmer_distribution_from_fastq.py',
       #         'draw_kmer_distribution_from_histo.py',
       #         'draw_kmer_distribution_from_jellyfish_database.py'])
