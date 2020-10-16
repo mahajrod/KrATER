@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/71775920.svg)](https://zenodo.org/badge/latestdoi/71775920)
+
 # KrATER (K-mer Analysis Tool Easy to Run)
 
 I. Requirements
