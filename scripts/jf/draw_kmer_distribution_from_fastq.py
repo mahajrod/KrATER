@@ -83,7 +83,7 @@ base_file = "%s.jf" % output_prefix
 kmer_table_file = "%s.counts" % output_prefix
 kmer_file = "%s.kmer" % output_prefix
 
-histo_file = "%sr.histo" % output_prefix
+histo_file = "%s.histo" % output_prefix
 picture_prefix = "%s.histogram" % output_prefix
 
 Jellyfish.threads = args.threads
