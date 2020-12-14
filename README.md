@@ -15,6 +15,15 @@ I. Requirements
 
 II. Installation
 
+    0. Fast way
+        - install jellyfish 2.x.x  from http://www.genome.umd.edu/jellyfish.html
+        
+        - sudo pip install routoolpa krater
+        
+        or
+        
+        - pip install --user routoolpa krater 
+
     1. Install requirements 
         - install jellyfish 2.x.x  from http://www.genome.umd.edu/jellyfish.html
     
@@ -28,6 +37,12 @@ II. Installation
                 pip install --user matplotlib numpy scipy
         
         - install RouToolPa
+            From pip with root permission:
+                sudo pip install routoolpa
+            
+            From pip without root permissions:
+                pip install --user routoolpa
+        
             Get RouToolPa
                 git clone https://github.com/mahajrod/routoolpa
         
@@ -41,7 +56,7 @@ II. Installation
             Run in terminal
                 source ~/.profile
         
-            
+        
     2. Install KrATER
         Use variant 3 to install newest version of KrATER
         Variant 1: install using pip (old version)
