@@ -203,8 +203,8 @@ class JellyfishRoutines(Tool):
                 plt.ylim(ymin=1, ymax=max_counts)
                 plt.xlabel("Multiplicity")
                 plt.ylabel("Number of distinct %s-mers" % kmer_length)
-                subplot.set_yscale('log', basey=logbase)
-                subplot.set_xscale('log', basex=logbase)
+                subplot.set_yscale('log', base=logbase)
+                subplot.set_xscale('log', base=logbase)
 
                 figure = plt.figure(2, figsize=(5, 5), dpi=300)
                 subplot = plt.subplot(1, 1, 1)
@@ -255,8 +255,8 @@ class JellyfishRoutines(Tool):
                     plt.ylabel("Number of distinct %s-mers" % kmer_length, fontsize=13)
 
                     if i == 1:
-                        subplot_list[0].set_yscale('log', basey=logbase)
-                        subplot_list[0].set_xscale('log', basex=logbase)
+                        subplot_list[0].set_yscale('log', base=logbase)
+                        subplot_list[0].set_xscale('log', base=logbase)
                         plt.xlim(xmin=1, xmax=max_bin)
                         plt.ylim(ymin=1, ymax=max_counts)
                     elif i == 2:
