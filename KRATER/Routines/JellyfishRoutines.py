@@ -2,6 +2,7 @@
 __author__ = 'Sergei F. Kliver'
 import os
 import shutil
+from pathlib import Path
 import numpy as np
 from scipy.signal import argrelextrema
 
@@ -11,6 +12,7 @@ import matplotlib.pyplot as plt
 plt.ioff()
 from RouToolPa.Tools.Abstract import Tool
 from RouToolPa.Routines import MatplotlibRoutines, MathRoutines
+from RouToolPa.Tools.Kmers import GenomeScope2
 
 
 class JellyfishRoutines(Tool):
@@ -103,13 +105,17 @@ class JellyfishRoutines(Tool):
             shutil.rmtree(splited_output_dir)
             shutil.rmtree(splited_sorted_unique_output)
 
-    def draw_kmer_distribution(self, histo_file_list, kmer_length, output_prefix, label_list=None, output_formats=["svg", "png"],
-                               logbase=10, non_log_low_limit=5, non_log_high_limit=100, order=3, mode="wrap",
-                               check_peaks_coef=10, draw_separated_pictures=False,
-                               use_second_peak_for_genome_size_estimation=False, dont_show_genome_size_on_plot=False):
+    def draw_kmer_distribution(self, histo_file_list, kmer_length, output_prefix, label_list=None,
+                               output_formats=["svg", "png"], logbase=10, non_log_low_limit=5, non_log_high_limit=100,
+                               order=3, mode="wrap",check_peaks_coef=10, draw_separated_pictures=False,
+                               use_second_peak_for_genome_size_estimation=False, dont_show_genome_size_on_plot=False,
+                               genomescope2=True, ploidy=2, initial_haploid_coverage=None,
+                               genomescope_cmd="genomescope.R"):
 
         data_list = []
         parameters_list = []
+        out_dir_path = Path(output_prefix).parent
+        genomescope2_dir_path = out_dir_path / "genomescope2"
 
         stat_fd = open("%s.histo.stats" % output_prefix, "w")
         max_selected_counts = 0
@@ -123,17 +129,34 @@ class JellyfishRoutines(Tool):
         for histo_file, label in zip(histo_file_listtt, label_listtt if label_listtt else default_labels):
             bins, counts = np.loadtxt(histo_file, unpack=True)
             data_list.append((bins, counts))
+            genomescope2_sample_dir_path = genomescope2_dir_path / label
+            genomescope2_sample_stats_file = genomescope2_sample_dir_path / (label + "_stats.tsv")
+
+            if genomescope2:
+                GenomeScope2.get_genome_size(histo_file, kmer_length, genomescope2_sample_dir_path, label,
+                                             ploidy=ploidy, initial_haploid_coverage=initial_haploid_coverage,
+                                             draw_fitted_hist=True, testing=True, max_kmer_coverage=100000000,
+                                             cmd=genomescope_cmd)
+                with open(genomescope2_sample_stats_file, "r") as genomescope2_stat_fd:
+                    genomescope2_stat_fd.readline()
+                    genomescope2_haplome_coverage, genomescope2_haplome_coverage_min,  \
+                    genomescope2_haplome_coverage_max, genomescope2_haplome_coverage_half_conf_len = \
+                        list(map(float, genomescope2_stat_fd.readline().strip().split("\t")[1:]))
+                    genomescope2_genomesize, genomescope2_genomesize_min, \
+                    genomescope2_genomesize_max, genomescope2_genomesize_half_conf_len = \
+                        list(map(float, genomescope2_stat_fd.readline().strip().split("\t")[1:]))
 
             maximums_to_show, minimums_to_show, \
                 unique_peak_borders, number_of_distinct_kmers, \
                 number_of_distinct_kmers_with_errors,\
                 total_number_of_kmers, total_number_of_kmers_with_errors, \
-                estimated_genome_size = self.extract_parameters_from_histo(counts, bins,
-                                                                           output_prefix,
-                                                                           order=order,
-                                                                           mode=mode,
-                                                                           check_peaks_coef=check_peaks_coef,
-                                                                           use_second_peak_for_genome_size_estimation=use_second_peak_for_genome_size_estimation)
+                estimated_genome_size, estimated_genome_size, max_estimated_genome_size, min_estimated_genome_size, \
+                estimated_genome_size_half_conf_len = self.extract_parameters_from_histo(counts, bins,
+                                                                                         output_prefix,
+                                                                                         order=order,
+                                                                                         mode=mode,
+                                                                                         check_peaks_coef=check_peaks_coef,
+                                                                                         use_second_peak_for_genome_size_estimation=use_second_peak_for_genome_size_estimation)
 
             parameters_list.append((maximums_to_show,
                                     minimums_to_show,
@@ -142,7 +165,10 @@ class JellyfishRoutines(Tool):
                                     number_of_distinct_kmers_with_errors,
                                     total_number_of_kmers,
                                     total_number_of_kmers_with_errors,
-                                    estimated_genome_size))
+                                    estimated_genome_size,
+                                    max_estimated_genome_size,
+                                    min_estimated_genome_size,
+                                    estimated_genome_size_half_conf_len))
 
             unique_peak_width = unique_peak_borders[1] - unique_peak_borders[0] + 1
             #print unique_peak_borders
@@ -176,8 +202,10 @@ class JellyfishRoutines(Tool):
             general_stats += "Standard deviation of kmer multiplicity in first peak\t%.2f\n" % np.around(std_1, decimals=2)
             general_stats += "Variance coefficient of kmer multiplicity in first peak\t%.2f\n" % np.around(var_1,
                                                                                                            decimals=2)
-            general_stats += "Estimated genome size, bp\t%s\n" % ("NA" if estimated_genome_size is None else str(estimated_genome_size))
-            #with open("%s.histo.stats" % output_prefix, "w") as stat_fd:
+            general_stats += "Estimated genome size (naive), bp\t%s\n" % ("NA" if ((estimated_genome_size is None) or (estimated_genome_size_half_conf_len is None)) else ("%i ± %i" % (estimated_genome_size, estimated_genome_size_half_conf_len)))
+            if genomescope2:
+                general_stats += "Estimated genome size (genomescope2), bp\t%s\n" % ("NA" if ((genomescope2_genomesize is None) or (genomescope2_genomesize_half_conf_len is None)) else ("%i ± %i" % (int(genomescope2_genomesize), int(genomescope2_coverage_half_conf_len))))
+                general_stats += "Estimated haplome coverage (genomescope2)\t%s\n" % ("NA" if ((genomescope2_haplome_coverage is None) or (genomescope2_haplome_coverage_half_conf_len is None)) else ("%i ± %i" % (int(genomescope2_haplome_coverage), int(genomescope2_haplome_coverage_half_conf_len))))
 
             stat_fd.write(general_stats)
             print(general_stats)
@@ -219,19 +247,26 @@ class JellyfishRoutines(Tool):
             if estimated_genome_size is None:
                 legend = "NA"
             else:
-                size_in_terabases = float(estimated_genome_size) / float(10 ** 12)
-                size_in_gigabases = float(estimated_genome_size) / float(10 ** 9)
-                size_in_megabases = float(estimated_genome_size) / float(10 ** 6)
-                size_in_kilobases = float(estimated_genome_size) / float(10 ** 3)
+                final_estimated_genome_size = genomescope2_genomesize if genomescope2 else estimated_genome_size
+                final_estimated_genome_size_half_conf_len = genomescope2_genomesize_half_conf_len if genomescope2 else estimated_genome_size_half_conf_len
+
+                size_in_terabases = float(final_estimated_genome_size) / float(10 ** 12)
+                size_half_conf_len_in_terabases = float(final_estimated_genome_size_half_conf_len) / float(10 ** 12)
+                size_in_gigabases = float(final_estimated_genome_size) / float(10 ** 9)
+                size_half_conf_len_in_gigabases = float(final_estimated_genome_size_half_conf_len) / float(10 ** 9)
+                size_in_megabases = float(final_estimated_genome_size) / float(10 ** 6)
+                size_half_conf_len_in_megabases = float(final_estimated_genome_size_half_conf_len) / float(10 ** 6)
+                size_in_kilobases = float(final_estimated_genome_size) / float(10 ** 3)
+                size_half_conf_len_in_kilobases = float(final_estimated_genome_size_half_conf_len) / float(10 ** 3)
 
                 if size_in_terabases > 1:
-                    legend = "%s: %.2f Tbp" % (label, size_in_terabases)
+                    legend = "%s: %.2f±%.2f Tbp" % (label, size_in_terabases, size_half_conf_len_in_terabases)
                 elif size_in_gigabases > 1:
-                    legend = "%s: %.2f Gbp" % (label, size_in_gigabases)
+                    legend = "%s: %.2f±%.2f Gbp" % (label, size_in_gigabases, size_half_conf_len_in_gigabases)
                 elif size_in_megabases > 1:
-                    legend = "%s: %.2f Mbp" % (label, size_in_megabases)
+                    legend = "%s: %.2f±%.2f Mbp" % (label, size_in_megabases, size_half_conf_len_in_megabases)
                 else:
-                    legend = "%s: %.2f Kbp" % (label, size_in_kilobases)
+                    legend = "%s: %.2f±%.2f Kbp" % (label, size_in_kilobases, size_half_conf_len_in_kilobases)
 
             for index in range(3, 5):
                 figure = plt.figure(index, figsize=(5, 10))
@@ -371,11 +406,18 @@ class JellyfishRoutines(Tool):
 
         estimated_genome_size = estimated_genome_size/genome_coverage_peak if estimated_genome_size else None
 
+        max_estimated_genome_size = estimated_genome_size / (genome_coverage_peak - 1) if estimated_genome_size else None
+        min_estimated_genome_size = estimated_genome_size / (genome_coverage_peak + 1) if estimated_genome_size else None
+        estimated_genome_size_half_conf_len = max([max_estimated_genome_size - estimated_genome_size,
+                                                   estimated_genome_size - min_estimated_genome_size])
         return maximums_to_show, \
                minimums_to_show, \
                (local_minimums_idx[0], nearest_value_to_first_min_idx), \
                number_of_distinct_kmers, number_of_distinct_kmers_with_errors, \
-               total_number_of_kmers, total_number_of_kmers_with_errors, estimated_genome_size
+               total_number_of_kmers, total_number_of_kmers_with_errors, \
+               estimated_genome_size, max_estimated_genome_size, min_estimated_genome_size, \
+               estimated_genome_size_half_conf_len
+
 
 if __name__ == "__main__":
     pass

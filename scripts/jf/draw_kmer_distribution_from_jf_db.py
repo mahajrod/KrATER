@@ -31,11 +31,30 @@ parser.add_argument("-d", "--draw_separated_pictures", action="store_true", dest
                     default=False,
                     help="Draw additional separated pictures for double logarithmic and linear scales."
                          "Default - False")
+
+parser.add_argument("-n", "--naive", action="store_true", dest="naive", default=False,
+                    help="Use naive estimation of genome size. By default, genomescope2 is used.")
+
 parser.add_argument("-u", "--point_number", action="store", dest="point_number", default=3, type=int,
                     help="Number of values on both sides from each bin in histogram to count for detection "
-                         "of maximums and minimums. Rise if you histogram is noisy. Default: 3")
+                         "of maximums and minimums. Rise if your histogram is noisy."
+                         "Affects only naive genomesize estimation. Default: 3")
 parser.add_argument("-z", "--use_second_peak", action="store_true", dest="use_second_peak", default=False,
-                    help="Use second peak from histogram for genome size estimation")
+                    help="Use second peak from histogram for naive genome size estimation."
+                         "Affects only naive genomesize estimation.")
+
+parser.add_argument("--ploidy", action="store", dest="ploidy", default=2, type=int,
+                    help="Ploidy of the sample. Affects only genomesize estimation by GenomeScope2."
+                         " Default: 2")
+parser.add_argument("--initial_haploid_coverage", action="store", dest="initial_haploid_coverage", default=None,
+                    type=float,
+                    help="Initial estimation of the haploid coverage. "
+                         "Affects only genomesize estimation by GenomeScope2."
+                         " Default: not set")
+parser.add_argument("--genomescope_cmd", action="store", dest="genomescope_cmd", default="genomescope.R",
+                    help="Script to call GenomeScope2. Affects only genomesize estimation by GenomeScope2."
+                         " Default: genomescope.R")
+
 parser.add_argument("--dont_show_genome_size_on_plot", action="store_true", dest="dont_show_genome_size_on_plot", default=False,
                     help="Dont show genome size on plot. Default: False")
 
