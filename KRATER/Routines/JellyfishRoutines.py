@@ -244,12 +244,12 @@ class JellyfishRoutines(Tool):
                 plt.xlim(xmin=non_log_low_limit, xmax=non_log_high_limit)
                 plt.ylim(ymin=0, ymax=max_selected_counts)
 
-            if estimated_genome_size is None:
+            final_estimated_genome_size = genomescope2_genomesize if genomescope2 else estimated_genome_size
+            final_estimated_genome_size_half_conf_len = genomescope2_genomesize_half_conf_len if genomescope2 else estimated_genome_size_half_conf_len
+
+            if final_estimated_genome_size is None:
                 legend = "NA"
             else:
-                final_estimated_genome_size = genomescope2_genomesize if genomescope2 else estimated_genome_size
-                final_estimated_genome_size_half_conf_len = genomescope2_genomesize_half_conf_len if genomescope2 else estimated_genome_size_half_conf_len
-
                 size_in_terabases = float(final_estimated_genome_size) / float(10 ** 12)
                 size_half_conf_len_in_terabases = float(final_estimated_genome_size_half_conf_len) / float(10 ** 12)
                 size_in_gigabases = float(final_estimated_genome_size) / float(10 ** 9)
@@ -409,7 +409,7 @@ class JellyfishRoutines(Tool):
         max_estimated_genome_size = estimated_genome_size / (genome_coverage_peak - 1) if estimated_genome_size else None
         min_estimated_genome_size = estimated_genome_size / (genome_coverage_peak + 1) if estimated_genome_size else None
         estimated_genome_size_half_conf_len = max([max_estimated_genome_size - estimated_genome_size,
-                                                   estimated_genome_size - min_estimated_genome_size])
+                                                   estimated_genome_size - min_estimated_genome_size]) if estimated_genome_size else None
         return maximums_to_show, \
                minimums_to_show, \
                (local_minimums_idx[0], nearest_value_to_first_min_idx), \
