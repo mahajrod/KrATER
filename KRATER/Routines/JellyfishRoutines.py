@@ -204,7 +204,7 @@ class JellyfishRoutines(Tool):
                                                                                                            decimals=2)
             general_stats += "Estimated genome size (naive), bp\t%s\n" % ("NA" if ((estimated_genome_size is None) or (estimated_genome_size_half_conf_len is None)) else ("%i ± %i" % (estimated_genome_size, estimated_genome_size_half_conf_len)))
             if genomescope2:
-                general_stats += "Estimated genome size (genomescope2), bp\t%s\n" % ("NA" if ((genomescope2_genomesize is None) or (genomescope2_genomesize_half_conf_len is None)) else ("%i ± %i" % (int(genomescope2_genomesize), int(genomescope2_coverage_half_conf_len))))
+                general_stats += "Estimated genome size (genomescope2), bp\t%s\n" % ("NA" if ((genomescope2_genomesize is None) or (genomescope2_genomesize_half_conf_len is None)) else ("%i ± %i" % (int(genomescope2_genomesize), int(genomescope2_genomesize_half_conf_len))))
                 general_stats += "Estimated haplome coverage (genomescope2)\t%s\n" % ("NA" if ((genomescope2_haplome_coverage is None) or (genomescope2_haplome_coverage_half_conf_len is None)) else ("%i ± %i" % (int(genomescope2_haplome_coverage), int(genomescope2_haplome_coverage_half_conf_len))))
 
             stat_fd.write(general_stats)
