@@ -116,7 +116,6 @@ class JellyfishRoutines(Tool):
         parameters_list = []
         out_dir_path = Path(output_prefix).parent
         genomescope2_dir_path = out_dir_path / "genomescope2"
-
         stat_fd = open("%s.histo.stats" % output_prefix, "w")
         max_selected_counts = 0
         max_counts = 0
@@ -130,6 +129,7 @@ class JellyfishRoutines(Tool):
             bins, counts = np.loadtxt(histo_file, unpack=True)
             data_list.append((bins, counts))
             genomescope2_sample_dir_path = genomescope2_dir_path / label
+            genomescope2_sample_dir_path.mkdir(parents=True, exist_ok=True)
             genomescope2_sample_stats_file = genomescope2_sample_dir_path / (label + "_stats.tsv")
 
             if genomescope2:
