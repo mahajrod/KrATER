@@ -81,4 +81,7 @@ JellyfishRoutines.draw_kmer_distribution(histo_file,
                                          order=args.point_number,
                                          use_second_peak_for_genome_size_estimation=args.use_second_peak,
                                          draw_separated_pictures=args.draw_separated_pictures,
-                                         dont_show_genome_size_on_plot=args.dont_show_genome_size_on_plot) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
+                                         dont_show_genome_size_on_plot=args.dont_show_genome_size_on_plot,
+                                         genomescope2=not args.naive, ploidy=args.ploidy,
+                                         initial_haploid_coverage=args.initial_haploid_coverage,
+                                         genomescope_cmd=args.genomescope_cmd) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
