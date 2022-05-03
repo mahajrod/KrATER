@@ -405,11 +405,11 @@ class JellyfishRoutines(Tool):
 
         # print genome_coverage_peak
 
-        estimated_genome_size = estimated_genome_size/genome_coverage_peak if estimated_genome_size else None
+        naive_estimated_genome_size = estimated_genome_size/genome_coverage_peak if estimated_genome_size else None
 
-        max_estimated_genome_size = estimated_genome_size / (genome_coverage_peak - 1) if estimated_genome_size else None
-        min_estimated_genome_size = estimated_genome_size / (genome_coverage_peak + 1) if estimated_genome_size else None
-        estimated_genome_size_half_conf_len = max([max_estimated_genome_size - estimated_genome_size,
+        max_naive_estimated_genome_size = estimated_genome_size / (genome_coverage_peak - 1) if estimated_genome_size else None
+        min_naive_estimated_genome_size = estimated_genome_size / (genome_coverage_peak + 1) if estimated_genome_size else None
+        naive_estimated_genome_size_half_conf_len = max([max_estimated_genome_size - estimated_genome_size,
                                                    estimated_genome_size - min_estimated_genome_size]) if estimated_genome_size else None
         print(max_estimated_genome_size, min_estimated_genome_size, estimated_genome_size_half_conf_len)
         return maximums_to_show, \
@@ -417,8 +417,8 @@ class JellyfishRoutines(Tool):
                (local_minimums_idx[0], nearest_value_to_first_min_idx), \
                number_of_distinct_kmers, number_of_distinct_kmers_with_errors, \
                total_number_of_kmers, total_number_of_kmers_with_errors, \
-               estimated_genome_size, max_estimated_genome_size, min_estimated_genome_size, \
-               estimated_genome_size_half_conf_len
+               naive_estimated_genome_size, max_naive_estimated_genome_size, min_naive_estimated_genome_size, \
+               naive_estimated_genome_size_half_conf_len
 
 
 if __name__ == "__main__":
