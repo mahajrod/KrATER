@@ -157,8 +157,6 @@ class JellyfishRoutines(Tool):
                                                                                          mode=mode,
                                                                                          check_peaks_coef=check_peaks_coef,
                                                                                          use_second_peak_for_genome_size_estimation=use_second_peak_for_genome_size_estimation)
-            print("AAAAAA")
-            print([max_estimated_genome_size, min_estimated_genome_size, estimated_genome_size_half_conf_len])
             parameters_list.append((maximums_to_show,
                                     minimums_to_show,
                                     unique_peak_borders,
@@ -411,7 +409,6 @@ class JellyfishRoutines(Tool):
         min_naive_estimated_genome_size = estimated_genome_size / (genome_coverage_peak + 1) if estimated_genome_size else None
         naive_estimated_genome_size_half_conf_len = max([max_naive_estimated_genome_size - naive_estimated_genome_size,
                                                    naive_estimated_genome_size - min_naive_estimated_genome_size]) if estimated_genome_size else None
-        print(max_naive_estimated_genome_size, min_naive_estimated_genome_size, naive_estimated_genome_size_half_conf_len)
         return maximums_to_show, \
                minimums_to_show, \
                (local_minimums_idx[0], nearest_value_to_first_min_idx), \
