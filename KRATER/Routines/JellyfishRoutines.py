@@ -411,7 +411,7 @@ class JellyfishRoutines(Tool):
         min_naive_estimated_genome_size = estimated_genome_size / (genome_coverage_peak + 1) if estimated_genome_size else None
         naive_estimated_genome_size_half_conf_len = max([max_naive_estimated_genome_size - naive_estimated_genome_size,
                                                    naive_estimated_genome_size - min_naive_estimated_genome_size]) if estimated_genome_size else None
-        print(max_estimated_genome_size, min_estimated_genome_size, estimated_genome_size_half_conf_len)
+        print(max_naive_estimated_genome_size, min_naive_estimated_genome_size, naive_estimated_genome_size_half_conf_len)
         return maximums_to_show, \
                minimums_to_show, \
                (local_minimums_idx[0], nearest_value_to_first_min_idx), \
