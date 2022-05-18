@@ -57,7 +57,9 @@ parser.add_argument("--genomescope_cmd", action="store", dest="genomescope_cmd",
                          " Default: genomescope.R")
 parser.add_argument("--dont_show_genome_size_on_plot", action="store_true", dest="dont_show_genome_size_on_plot",
                     default=False, help="Dont show genome size on plot. Default: False")
-
+parser.add_argument("-x", "--dont_show_genome_size_ci_on_plot", action="store_true",
+                    dest="dont_show_genome_size_ci_on_plot", default=False,
+                    help="Dont show confidence interval for genome size on plot. Default: False")
 args = parser.parse_args()
 
 JellyfishRoutines.draw_kmer_distribution(args.input,
@@ -74,4 +76,5 @@ JellyfishRoutines.draw_kmer_distribution(args.input,
                                          dont_show_genome_size_on_plot=args.dont_show_genome_size_on_plot,
                                          genomescope2=not args.naive, ploidy=args.ploidy,
                                          initial_haploid_coverage=args.initial_haploid_coverage,
-                                         genomescope_cmd=args.genomescope_cmd) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
+                                         genomescope_cmd=args.genomescope_cmd,
+                                         show_confidence_interval=not args.dont_show_genome_size_ci_on_plot) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)

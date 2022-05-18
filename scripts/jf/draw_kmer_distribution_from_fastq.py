@@ -81,6 +81,9 @@ parser.add_argument("--turn_on_timelog", action="store_true", dest="turn_on_time
                     help="Turn on timelog. Default: False")
 parser.add_argument("--generators", action="store", dest="generators",
                     help="File with commands for fastq generators. Default: None")
+parser.add_argument("-x", "--dont_show_genome_size_ci_on_plot", action="store_true",
+                    dest="dont_show_genome_size_ci_on_plot", default=False,
+                    help="Dont show confidence interval for genome size on plot. Default: False")
 #parser.add_argument("-d", "--draw_peaks_and_gaps", action="store_true", dest="draw_peaks_and_gaps",
 #                    help="Draw peaks and gaps")
 
@@ -122,4 +125,5 @@ JellyfishRoutines.draw_kmer_distribution(histo_file, args.kmer_length, picture_p
                                          dont_show_genome_size_on_plot=args.dont_show_genome_size_on_plot,
                                          genomescope2=not args.naive, ploidy=args.ploidy,
                                          initial_haploid_coverage=args.initial_haploid_coverage,
-                                         genomescope_cmd=args.genomescope_cmd) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
+                                         genomescope_cmd=args.genomescope_cmd,
+                                         show_confidence_interval=not args.dont_show_genome_size_ci_on_plot) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)

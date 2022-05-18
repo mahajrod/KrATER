@@ -110,7 +110,7 @@ class JellyfishRoutines(Tool):
                                order=3, mode="wrap",check_peaks_coef=10, draw_separated_pictures=False,
                                use_second_peak_for_genome_size_estimation=False, dont_show_genome_size_on_plot=False,
                                genomescope2=True, ploidy=2, initial_haploid_coverage=None,
-                               genomescope_cmd="genomescope.R"):
+                               genomescope_cmd="genomescope.R", show_confidence_interval=True):
 
         data_list = []
         parameters_list = []
@@ -259,13 +259,25 @@ class JellyfishRoutines(Tool):
                 size_half_conf_len_in_kilobases = float(final_estimated_genome_size_half_conf_len) / float(10 ** 3)
 
                 if size_in_terabases > 1:
-                    legend = "%s: %.2f±%.2f Tbp" % (label, size_in_terabases, size_half_conf_len_in_terabases)
+                    legend = "%s: %.2f" % (label, size_in_terabases)
+                    if show_confidence_interval:
+                        legend += "±%.2f" % size_half_conf_len_in_terabases
+                    legend += " Tbp"
                 elif size_in_gigabases > 1:
-                    legend = "%s: %.2f±%.2f Gbp" % (label, size_in_gigabases, size_half_conf_len_in_gigabases)
+                    legend = "%s: %.2f" % (label, size_in_gigabases)
+                    if show_confidence_interval:
+                        legend += "±%.2f" % size_half_conf_len_in_gigabases
+                    legend += " Gbp"
                 elif size_in_megabases > 1:
-                    legend = "%s: %.2f±%.2f Mbp" % (label, size_in_megabases, size_half_conf_len_in_megabases)
+                    legend = "%s: %.2f" % (label, size_in_megabases)
+                    if show_confidence_interval:
+                        legend += "±%.2f" % size_half_conf_len_in_megabases
+                    legend += " Mbp"
                 else:
-                    legend = "%s: %.2f±%.2f Kbp" % (label, size_in_kilobases, size_half_conf_len_in_kilobases)
+                    legend = "%s: %.2f" % (label, size_in_kilobases)
+                    if show_confidence_interval:
+                        legend += "±%.2f" % size_half_conf_len_in_kilobases
+                    legend += " Kbp"
 
             for index in range(3, 5):
                 figure = plt.figure(index, figsize=(5, 10))
