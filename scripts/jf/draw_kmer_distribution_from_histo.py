@@ -48,7 +48,7 @@ parser.add_argument("--ploidy", action="store", dest="ploidy", default=2, type=i
                     help="Ploidy of the sample. Affects only genomesize estimation by GenomeScope2."
                          " Default: 2")
 parser.add_argument("--initial_haploid_coverage", action="store", dest="initial_haploid_coverage", default=None,
-                    type=int,
+                    type=float,
                     help="Initial estimation of the haploid coverage. "
                          "Affects only genomesize estimation by GenomeScope2."
                          " Default: not set")
