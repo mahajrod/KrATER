@@ -152,7 +152,7 @@ class JellyfishRoutines(Tool):
                 total_number_of_kmers, total_number_of_kmers_with_errors, \
                 estimated_genome_size, max_estimated_genome_size, min_estimated_genome_size, \
                 estimated_genome_size_half_conf_len = self.extract_parameters_from_histo(counts, bins,
-                                                                                         output_prefix,
+                                                                                         "{}.{}".format(output_prefix, label),
                                                                                          order=order,
                                                                                          mode=mode,
                                                                                          check_peaks_coef=check_peaks_coef,
