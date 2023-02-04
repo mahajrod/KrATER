@@ -3,13 +3,25 @@ __author__ = 'Sergei F. Kliver'
 
 import os
 import argparse
-
+from copy import deepcopy
 from Bio import SeqIO
 
-from RouToolPa.Routines.Sequence import rev_com_generator
-from RouToolPa.Tools.Kmers import Jellyfish
+
+from KRATER.Tools.Kmers import Jellyfish
 
 from KRATER.Routines import JellyfishRoutines
+
+
+def rev_com_generator(rec_dict, yield_original_record=False, rc_suffix="_rc", add_rc_suffix="False"):
+    for record_id in rec_dict:
+        reverse_seq = rec_dict[record_id].seq.reverse_complement()
+        record = deepcopy(rec_dict[record_id])
+        record.seq = reverse_seq
+        record.id = record_id + rc_suffix if yield_original_record or add_rc_suffix else record.id
+        if yield_original_record:
+            yield rec_dict[record_id]
+        yield record
+
 
 parser = argparse.ArgumentParser()
 
@@ -84,8 +96,7 @@ parser.add_argument("--generators", action="store", dest="generators",
 parser.add_argument("-x", "--dont_show_genome_size_ci_on_plot", action="store_true",
                     dest="dont_show_genome_size_ci_on_plot", default=False,
                     help="Dont show confidence interval for genome size on plot. Default: False")
-#parser.add_argument("-d", "--draw_peaks_and_gaps", action="store_true", dest="draw_peaks_and_gaps",
-#                    help="Draw peaks and gaps")
+
 
 args = parser.parse_args()
 
@@ -126,4 +137,4 @@ JellyfishRoutines.draw_kmer_distribution(histo_file, args.kmer_length, picture_p
                                          genomescope2=not args.naive, ploidy=args.ploidy,
                                          initial_haploid_coverage=args.initial_haploid_coverage,
                                          genomescope_cmd=args.genomescope_cmd,
-                                         show_confidence_interval=not args.dont_show_genome_size_ci_on_plot) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
+                                         show_confidence_interval=not args.dont_show_genome_size_ci_on_plot)

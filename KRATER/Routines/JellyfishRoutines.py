@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 __author__ = 'Sergei F. Kliver'
-import os
-import shutil
+
 from pathlib import Path
 import numpy as np
 from scipy.signal import argrelextrema
 
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-plt.ioff()
-from RouToolPa.Tools.Abstract import Tool
-from RouToolPa.Routines import MatplotlibRoutines, MathRoutines
-from RouToolPa.Tools.Kmers import GenomeScope2
+
+from matplotlib.transforms import Bbox, TransformedBbox, blended_transform_factory
+from mpl_toolkits.axes_grid1.inset_locator import BboxPatch, BboxConnector, BboxConnectorPatch
+
+from KRATER.Tools.Abstract import Tool
+
+from KRATER.Tools.Kmers import GenomeScope2
 
 
 class JellyfishRoutines(Tool):
@@ -24,94 +24,12 @@ class JellyfishRoutines(Tool):
     def __init__(self, path="", max_threads=4):
         Tool.__init__(self, "jellyfish", path=path, max_threads=max_threads)
 
-    def scan_for_contamination(self, sequence_file, jf_database, out_file, splited_input_dir="splited_fasta",
-                               parsing_mode="parse",splited_full_output_dir="splited_full_output",
-                               splited_output_dir="splited_output",
-                               splited_sorted_unique_output="splited_sorted_unique_output",
-                               retain_intermediate_file=False, ):
-
-        print("Splitting fasta file...")
-
-        self.split_fasta(sequence_file, splited_input_dir, num_of_recs_per_file=1, num_of_files=None,
-                         output_prefix="splited_fasta", parsing_mode=parsing_mode)
-        options_list = []
-
-        print("Scanning database...")
-        self.safe_mkdir(splited_output_dir)
-        self.safe_mkdir(splited_full_output_dir)
-        self.safe_mkdir(splited_sorted_unique_output)
-        
-        for filename in os.listdir(splited_input_dir):
-            input_file = "%s/%s" % (splited_input_dir, filename)
-            output_file = "%s/%s.kmer.counts" % (splited_output_dir, filename)
-            full_output_file = "%s/%s" % (splited_full_output_dir, filename)
-            output_sorted_unique_file = "%s/%s.kmer.sorted.unique.counts" % (splited_sorted_unique_output, filename)
-
-            options = "jellyfish query"
-            options += " -s %s" % input_file
-            options += " %s" % jf_database
-            options += " | tee %s | awk '{if ($2 > 0) print $0}' | tee %s | sort | uniq > %s" % (full_output_file,
-                                                                                                 output_file,
-                                                                                                 output_sorted_unique_file)
-
-            options_list.append(options)
-
-        self.parallel_execute(options_list, cmd="")
-
-        print("Analyzing results...")
-
-        with open(out_file, "w") as out_fd:
-            out_fd.write("#record_id\tkmer_number\tcovered_positions\tcovered_positions,%\t"
-                         "covered_unique_position\tcovered_unique_positions,%\t"
-                         "kmer_mean_coverage\tkmer_median_coverage\tdescription\n")
-            for filename in os.listdir(splited_input_dir):
-                input_file = "%s/%s" % (splited_input_dir, filename)
-                output_file = "%s/%s.kmer.counts" % (splited_output_dir, filename)
-                full_output_file = "%s/%s" % (splited_full_output_dir, filename)
-                output_sorted_unique_file = "%s/%s.kmer.sorted.unique.counts" % (splited_sorted_unique_output, filename)
-
-                seq_record = self.get_first_record_from_file(input_file, format="fasta")
-
-                covered_positions = 0
-
-                with open(output_file, "r") as a_fd:
-                    for line in a_fd:
-                        covered_positions += 1
-                if covered_positions == 0:
-                    continue
-                uniq_covered_positions = 0
-                total_kmer_number = 0
-
-                with open(output_sorted_unique_file, "r") as b_fd:
-                    for line in b_fd:
-                        uniq_covered_positions += 1
-                        total_kmer_number += int(line.strip().split()[1])
-                kmer_number  = 0
-                with open(full_output_file, "r") as a_fd:
-                    for line in a_fd:
-                        kmer_number += 1
-                kmer_coverage = np.loadtxt(full_output_file, usecols=1)
-                mean_kmer_coverage = np.mean(kmer_coverage)
-                median_kmer_coverage = np.median(kmer_coverage)
-                out_fd.write("%s\t%i\t%i\t%.2f\t%i\t%.2f\t%.2f\t%.2f\t%s\n" % (seq_record.id, kmer_number, covered_positions,
-                                                                                   100*float(covered_positions)/float(kmer_number),
-                                                                                   uniq_covered_positions,
-                                                                                   100*float(uniq_covered_positions)/float(kmer_number),
-                                                                                   mean_kmer_coverage, median_kmer_coverage,
-                                                                                   seq_record.description))
-
-        if not retain_intermediate_file:
-            shutil.rmtree(splited_input_dir)
-            shutil.rmtree(splited_output_dir)
-            shutil.rmtree(splited_sorted_unique_output)
-
     def draw_kmer_distribution(self, histo_file_list, kmer_length, output_prefix, label_list=None,
-                               output_formats=["svg", "png"], logbase=10, non_log_low_limit=5, non_log_high_limit=100,
-                               order=3, mode="wrap",check_peaks_coef=10, draw_separated_pictures=False,
+                               output_formats=("svg", "png"), logbase=10, non_log_low_limit=5, non_log_high_limit=100,
+                               order=3, mode="wrap", check_peaks_coef=10, draw_separated_pictures=False,
                                use_second_peak_for_genome_size_estimation=False, dont_show_genome_size_on_plot=False,
                                genomescope2=True, ploidy=2, initial_haploid_coverage=None,
                                genomescope_cmd="genomescope.R", show_confidence_interval=True):
-
         data_list = []
         parameters_list = []
         out_dir_path = Path(output_prefix).parent
@@ -170,19 +88,13 @@ class JellyfishRoutines(Tool):
                                     estimated_genome_size_half_conf_len))
 
             unique_peak_width = unique_peak_borders[1] - unique_peak_borders[0] + 1
-            #print unique_peak_borders
-            #print unique_peak_width
-            #print "Maximums to show"
-            #print maximums_to_show
-            #print "Minimums to show"
-            #print minimums_to_show
 
-            unique_peak_borders_mean_multiplicity = MathRoutines.mean_from_bins(bins[unique_peak_borders[0]: unique_peak_borders[1]+1],
-                                                                                counts[unique_peak_borders[0]: unique_peak_borders[1]+1])
-            std_1 = MathRoutines.std_from_bins(bins[unique_peak_borders[0]: unique_peak_borders[1]+1],
-                                               counts[unique_peak_borders[0]: unique_peak_borders[1]+1],
-                                               mean=unique_peak_borders_mean_multiplicity)
-            var_1 = std_1 / unique_peak_borders_mean_multiplicity
+            unique_peak_borders_mean_multiplicity = self.mean_from_bins(bins[unique_peak_borders[0]: unique_peak_borders[1]+1],
+                                                                        counts[unique_peak_borders[0]: unique_peak_borders[1]+1])
+            #std_1 = MathRoutines.std_from_bins(bins[unique_peak_borders[0]: unique_peak_borders[1]+1],
+            #                                   counts[unique_peak_borders[0]: unique_peak_borders[1]+1],
+            #                                   mean=unique_peak_borders_mean_multiplicity)
+            #var_1 = std_1 / unique_peak_borders_mean_multiplicity
 
             fraction_of_distinct_kmers_with_errors = float(number_of_distinct_kmers_with_errors)/float(number_of_distinct_kmers)
             fraction_of_kmers_with_errors = float(total_number_of_kmers_with_errors)/float(total_number_of_kmers)
@@ -198,9 +110,9 @@ class JellyfishRoutines(Tool):
             general_stats += "Kmer multiplicity at first maximum\t%s\n" % (str(maximums_to_show[0][0]) if maximums_to_show else "None")
             general_stats += "Width of first peak\t%i\n" % unique_peak_width
             general_stats += "Mean kmer multiplicity in first peak\t%.2f\n" % np.around(unique_peak_borders_mean_multiplicity, decimals=2)
-            general_stats += "Standard deviation of kmer multiplicity in first peak\t%.2f\n" % np.around(std_1, decimals=2)
-            general_stats += "Variance coefficient of kmer multiplicity in first peak\t%.2f\n" % np.around(var_1,
-                                                                                                           decimals=2)
+            #general_stats += "Standard deviation of kmer multiplicity in first peak\t%.2f\n" % np.around(std_1, decimals=2)
+            #general_stats += "Variance coefficient of kmer multiplicity in first peak\t%.2f\n" % np.around(var_1,
+            #                                                                                               decimals=2)
             general_stats += "Estimated genome size (naive), bp\t%s\n" % ("NA" if ((estimated_genome_size is None) or (estimated_genome_size_half_conf_len is None)) else ("%i ± %i" % (estimated_genome_size, estimated_genome_size_half_conf_len)))
             if genomescope2:
                 general_stats += "Estimated genome size (genomescope2), bp\t%s\n" % ("NA" if ((genomescope2_genomesize is None) or (genomescope2_genomesize_half_conf_len is None)) else ("%i ± %i" % (int(genomescope2_genomesize), int(genomescope2_genomesize_half_conf_len))))
@@ -287,8 +199,6 @@ class JellyfishRoutines(Tool):
                     plt.suptitle("Distribution of %s-mers" % kmer_length, fontweight='bold', fontsize=13)
                     plt.plot(b, c, label=legend) if (i == 1) and (not dont_show_genome_size_on_plot) else plt.plot(b, c)
 
-                    #plt.legend((legend, ), loc="upper right")
-                    #plt.legend(loc="upper right")
                     if i == 1:
                         plt.legend(loc="best")
 
@@ -310,7 +220,7 @@ class JellyfishRoutines(Tool):
                         plt.xlim(xmin=non_log_low_limit, xmax=non_log_high_limit)
                         plt.xlabel("Multiplicity", fontsize=15)
 
-                MatplotlibRoutines.zoom_effect(subplot_list[0], subplot_list[1], non_log_low_limit, non_log_high_limit)
+                self.zoom_effect(subplot_list[0], subplot_list[1], non_log_low_limit, non_log_high_limit)
                 plt.subplots_adjust(hspace=0.12, wspace=0.05, top=0.95, bottom=0.05, left=0.16, right=0.95)
 
         if draw_separated_pictures:
@@ -341,8 +251,7 @@ class JellyfishRoutines(Tool):
 
         return local_minimums_idx, local_maximums_idx
 
-    @staticmethod
-    def extract_parameters_from_histo(counts, bins, output_prefix, order=3, mode="wrap", check_peaks_coef=10,
+    def extract_parameters_from_histo(self, counts, bins, output_prefix, order=3, mode="wrap", check_peaks_coef=10,
                                       use_second_peak_for_genome_size_estimation=False):
         """
         check_peaks_coef:
@@ -363,7 +272,7 @@ class JellyfishRoutines(Tool):
                 out_fd.write("%i\t%i\n" % (bins[idx], counts[idx]))
 
         first_unique_peak_idx_idx = 0 if local_maximums_idx[0] != 0 else 1
-        #second_unique_peak_idx_idx = 1 if local_maximums_idx[1] != 0 else 2
+        # second_unique_peak_idx_idx = 1 if local_maximums_idx[1] != 0 else 2
         first_unique_peak_coverage = bins[local_maximums_idx[first_unique_peak_idx_idx]]
         second_unique_peak_coverage = bins[local_maximums_idx[first_unique_peak_idx_idx+1]]
 
@@ -382,17 +291,17 @@ class JellyfishRoutines(Tool):
                 minimums_in_checked_area_idx.append(minimum_index)
 
         if len(peaks_in_checked_area_idx) > 1:
-            print ("WARNING! Additional k-mer peaks were detected with multiplicity (%i, %i]" % (first_unique_peak_coverage,
-                                                                                                 max_checked_coverage))
+            print("WARNING! Additional k-mer peaks were detected with multiplicity (%i, %i]" % (first_unique_peak_coverage,
+                                                                                                max_checked_coverage))
 
-        nearest_value_to_first_min_idx = MathRoutines.find_nearest_scalar(counts[local_maximums_idx[first_unique_peak_idx_idx]:],
+        nearest_value_to_first_min_idx = self.find_nearest_scalar(counts[local_maximums_idx[first_unique_peak_idx_idx]:],
                                                                           counts[local_minimums_idx[0]]) + local_maximums_idx[first_unique_peak_idx_idx]
 
         number_of_distinct_kmers = sum(counts)
         number_of_distinct_kmers_with_errors = sum(counts[0:local_minimums_idx[0]])
         total_number_of_kmers = sum(np.multiply(counts, bins))
         total_number_of_kmers_with_errors = sum(np.multiply(counts[0:local_minimums_idx[0]],
-                                                                     bins[0:local_minimums_idx[0]]))
+                                                            bins[0:local_minimums_idx[0]]))
 
         maximums_to_show = [(bins[i], counts[i]) for i in peaks_in_checked_area_idx]
         minimums_to_show = [(bins[i], counts[i]) for i in minimums_in_checked_area_idx]
@@ -419,8 +328,12 @@ class JellyfishRoutines(Tool):
 
         max_naive_estimated_genome_size = estimated_genome_size / (genome_coverage_peak - 1) if estimated_genome_size else None
         min_naive_estimated_genome_size = estimated_genome_size / (genome_coverage_peak + 1) if estimated_genome_size else None
-        naive_estimated_genome_size_half_conf_len = max([max_naive_estimated_genome_size - naive_estimated_genome_size,
-                                                   naive_estimated_genome_size - min_naive_estimated_genome_size]) if estimated_genome_size else None
+        if estimated_genome_size:
+            naive_estimated_genome_size_half_conf_len = max(
+                                                            [max_naive_estimated_genome_size - naive_estimated_genome_size,
+                                                             naive_estimated_genome_size - min_naive_estimated_genome_size])
+        else:
+            naive_estimated_genome_size_half_conf_len = None
         return maximums_to_show, \
                minimums_to_show, \
                (local_minimums_idx[0], nearest_value_to_first_min_idx), \
@@ -429,6 +342,86 @@ class JellyfishRoutines(Tool):
                naive_estimated_genome_size, max_naive_estimated_genome_size, min_naive_estimated_genome_size, \
                naive_estimated_genome_size_half_conf_len
 
+    @staticmethod
+    def connect_bbox(bbox1, bbox2,
+                     loc1a, loc2a, loc1b, loc2b,
+                     prop_lines, prop_patches=None):
+        if prop_patches is None:
+            prop_patches = prop_lines.copy()
+            prop_patches["alpha"] = prop_patches.get("alpha", 1) * 0.2
 
-if __name__ == "__main__":
-    pass
+        c1 = BboxConnector(bbox1, bbox2, loc1=loc1a, loc2=loc2a, **prop_lines)
+        c1.set_clip_on(False)
+        c2 = BboxConnector(bbox1, bbox2, loc1=loc1b, loc2=loc2b, **prop_lines)
+        c2.set_clip_on(False)
+
+        bbox_patch1 = BboxPatch(bbox1, **prop_patches)
+        bbox_patch2 = BboxPatch(bbox2, **prop_patches)
+
+        p = BboxConnectorPatch(bbox1, bbox2,
+                               loc1a=loc1a, loc2a=loc2a, loc1b=loc1b, loc2b=loc2b,
+                               **prop_patches)
+        p.set_clip_on(False)
+
+        return c1, c2, bbox_patch1, bbox_patch2, p
+
+    def zoom_effect(self, ax1, ax2, xmin, xmax, alpha=0.22, color="gray", **kwargs):
+        """
+        ax1 : the main axes
+        ax2 : the zoomed axes
+        (xmin,xmax) : the limits of the colored area in both plot axes.
+
+        connect ax1 & ax2. The x-range of (xmin, xmax) in both axes will
+        be marked.  The keywords parameters will be used ti create
+        patches.
+
+        """
+
+        trans1 = blended_transform_factory(ax1.transData, ax1.transAxes)
+        trans2 = blended_transform_factory(ax2.transData, ax2.transAxes)
+
+        bbox = Bbox.from_extents(xmin, 0, xmax, 1)
+
+        mybbox1 = TransformedBbox(bbox, trans1)
+        mybbox2 = TransformedBbox(bbox, trans2)
+
+        prop_patches = kwargs.copy()
+        prop_patches["ec"] = "none"
+        prop_patches["alpha"] = alpha
+        prop_patches["color"] = color
+
+        c1, c2, bbox_patch1, bbox_patch2, p = self.connect_bbox(mybbox1, mybbox2,
+                                                                loc1a=3, loc2a=2, loc1b=4, loc2b=1,
+                                                                prop_lines=kwargs, prop_patches=prop_patches)
+
+        ax1.add_patch(bbox_patch1)
+        ax2.add_patch(bbox_patch2)
+        ax2.add_patch(c1)
+        ax2.add_patch(c2)
+        ax2.add_patch(p)
+
+        return c1, c2, bbox_patch1, bbox_patch2, p
+
+    @staticmethod
+    def find_nearest_scalar(array, value, mode="index"):
+        # works for 1d array
+        idx = (np.abs(array - value)).argmin()
+        return idx if mode == "index" else array.flat[idx]
+
+    @staticmethod
+    def find_nearest_vector(array, value, mode="index"):
+        idx = np.array([np.linalg.norm(x + y) for (x, y) in array - value]).argmin()
+        return idx if mode == "index" else array[idx]
+
+    @staticmethod
+    def mean_from_bins(bins, counts):
+        return sum(np.multiply(bins, counts)) / sum(counts)
+
+    def variance_from_bins(self, bins, counts, mean=None):
+        mean_value = mean if mean else self.mean_from_bins(bins, counts)
+        deviation = bins - mean_value
+        variance = np.sum(np.multiply(np.power(deviation, 2), counts)) / sum(counts)
+        return variance
+
+    def std_from_bins(self, bins, counts, mean=None):
+        return np.sqrt(self.variance_from_bins(bins, counts, mean=mean))

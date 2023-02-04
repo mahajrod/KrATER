@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 __author__ = 'Sergei F. Kliver'
-#import os
 import argparse
 
 from KRATER.Routines import JellyfishRoutines
@@ -40,10 +39,6 @@ parser.add_argument("-u", "--point_number", action="store", dest="point_number",
 parser.add_argument("-z", "--use_second_peak", action="store_true", dest="use_second_peak", default=False,
                     help="Use second peak from histogram for naive genome size estimation."
                          "Affects only naive genomesize estimation.")
-
-#parser.add_argument("-d", "--draw_peaks_and_gaps", action="store_true", dest="draw_peaks_and_gaps",
-#                    help="Draw peaks and gaps")
-
 parser.add_argument("--ploidy", action="store", dest="ploidy", default=2, type=int,
                     help="Ploidy of the sample. Affects only genomesize estimation by GenomeScope2."
                          " Default: 2")
@@ -77,4 +72,4 @@ JellyfishRoutines.draw_kmer_distribution(args.input,
                                          genomescope2=not args.naive, ploidy=args.ploidy,
                                          initial_haploid_coverage=args.initial_haploid_coverage,
                                          genomescope_cmd=args.genomescope_cmd,
-                                         show_confidence_interval=not args.dont_show_genome_size_ci_on_plot) #, draw_peaks_and_gaps=args.draw_peaks_and_gaps)
+                                         show_confidence_interval=not args.dont_show_genome_size_ci_on_plot)

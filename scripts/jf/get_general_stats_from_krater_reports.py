@@ -3,7 +3,7 @@ __author__ = 'Sergei F. Kliver'
 
 import argparse
 from collections import OrderedDict
-from RouToolPa.Parsers.KrATER import KrATERReportCollection
+from KRATER.Parsers.KrATER import KrATERReportCollection
 
 parser = argparse.ArgumentParser()
 
