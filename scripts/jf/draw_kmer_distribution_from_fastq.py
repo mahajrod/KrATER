@@ -1,26 +1,9 @@
 #!/usr/bin/env python
 __author__ = 'Sergei F. Kliver'
-
-import os
 import argparse
-from copy import deepcopy
-from Bio import SeqIO
-
 
 from KRATER.Tools.Kmers import Jellyfish
-
 from KRATER.Routines import JellyfishRoutines
-
-
-def rev_com_generator(rec_dict, yield_original_record=False, rc_suffix="_rc", add_rc_suffix="False"):
-    for record_id in rec_dict:
-        reverse_seq = rec_dict[record_id].seq.reverse_complement()
-        record = deepcopy(rec_dict[record_id])
-        record.seq = reverse_seq
-        record.id = record_id + rc_suffix if yield_original_record or add_rc_suffix else record.id
-        if yield_original_record:
-            yield rec_dict[record_id]
-        yield record
 
 
 parser = argparse.ArgumentParser()
@@ -46,13 +29,8 @@ parser.add_argument("-t", "--threads", action="store", dest="threads", type=int,
 parser.add_argument("-b", "--count_both_strands", action="store_true", dest="count_both_strands",
                     help="Count kmers in both strands. NOTICE: only mer or its reverse-complement, whichever "
                          "comes first lexicographically, is stored and the count value is the number of "
-                         "occurrences of both. So this option is not suitable for generating sets of forward "
-                         "and reverse-complement kmers. For this case use -r/--add_reverse_complement option. "
-                         "Not compatible with -r/--add_reverse_complement option.")
-parser.add_argument("-r", "--add_reverse_complement", action="store_true", dest="add_rev_com",
-                    help="Add reverse-complement sequences before counting kmers. "
-                         "Works only for fasta sequences. "
-                         "Not compatible with -b/--count_both_strands option")
+                         "occurrences of both.")
+
 parser.add_argument("-j", "--jellyfish_path", action="store", dest="jellyfish_path",
                     help="Path to jellyfish")
 parser.add_argument("-w", "--low_limit", action="store", dest="low_limit", type=int, default=5,
@@ -101,15 +79,6 @@ parser.add_argument("-x", "--dont_show_genome_size_ci_on_plot", action="store_tr
 args = parser.parse_args()
 
 args.input = Jellyfish.make_list_of_path_to_files(args.input)
-if args.count_both_strands and args.add_rev_com:
-    raise ValueError("Options -b/--count_both_strands and -r/--add_reverse_complement are not compatible")
-
-if args.add_rev_com:
-    file_with_rev_com = args.output_prefix + "_with_rev_com.fasta"
-    record_dict = SeqIO.index_db("temp_index.idx", args.input, format="fasta")
-    SeqIO.write(rev_com_generator(record_dict, yield_original_record=True), file_with_rev_com, "fasta")
-    args.output_prefix += "_with_rev_com"
-    os.remove("temp_index.idx")
 
 output_prefix = "%s.k%i" % (args.output_prefix, args.kmer_length)
 base_file = "%s.jf" % output_prefix
@@ -122,7 +91,7 @@ picture_prefix = "%s.histogram" % output_prefix
 Jellyfish.threads = args.threads
 Jellyfish.timelog = "%s.jellyfish.time.log" % output_prefix if args.turn_on_timelog else None
 Jellyfish.path = args.jellyfish_path if args.jellyfish_path else ""
-Jellyfish.count(args.input if not args.add_rev_com else file_with_rev_com, base_file,
+Jellyfish.count(args.input, base_file,
                 kmer_length=args.kmer_length, hash_size=args.hash_size,
                 count_both_strands=args.count_both_strands,
                 generators=args.generators)
