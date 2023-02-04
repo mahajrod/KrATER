@@ -9,20 +9,17 @@ I. Requirements
         Numpy
         Scipy
         
-        RouToolPa (https://github.com/mahajrod/RouToolPa)
         
     2. Jellyfish 2
+    3. Modified genomescope2
 
 II. Installation
 
     0. Fast way
         - install jellyfish 2.x.x  from http://www.genome.umd.edu/jellyfish.html
         
-        - sudo pip install routoolpa krater
+        - sudo pip install krater
         
-        or
-        
-        - pip install --user routoolpa krater 
 
     1. Install requirements 
         - install jellyfish 2.x.x  from http://www.genome.umd.edu/jellyfish.html
@@ -36,25 +33,7 @@ II. Installation
         
                 pip install --user matplotlib numpy scipy
         
-        - install RouToolPa
-            From pip with root permission:
-                sudo pip install routoolpa
-            
-            From pip without root permissions:
-                pip install --user routoolpa
-        
-            Get RouToolPa
-                git clone https://github.com/mahajrod/routoolpa
-        
-            Add following strings to ~/.profile and ~/.bashrc (create files if absent). Don't forget to replace <ROUTOOLPA_DIR> with actual path
-            
-                PYTHONPATH=${PYTHONPATH}:<ROUTOOLPA_DIR>
-                PATH=${PATH}:<ROUTOOLPA_DIR>
-                export PYTHONPATH
-                export PATH
-                
-            Run in terminal
-                source ~/.profile
+        - install modified Genomescope2 from https://github.com/mahajrod/genomescope2.0
         
         
     2. Install KrATER
@@ -109,17 +88,16 @@ III. RUN
         Typical usage:
             draw_kmer_distribution_from_fastq.py -m 23  -t ${THREAD_NUMBER} -b -s 30G -e png -o ${OUTPUT_PREFIX} -i {COMMA_SEPARATED_LIST_OF_FASTQ_FILES} -w ${MINIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE}  -g ${MAXIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE}
         
-        Parameter description:
         
     2. If input file is jellyfish database
         
         Typical usage:
-            draw_kmer_distribution_from_jellyfish_database.py -i ${JELLYFISH_DATABASE}  -o ${OUTPUT_PREFIX} -w ${MINIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE} -g ${MAXIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE} -e png
+            draw_kmer_distribution_from_jf_db.py -i ${JELLYFISH_DATABASE}  -o ${OUTPUT_PREFIX} -w ${MINIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE} -g ${MAXIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE} -e png
         
     2. If input file is histogram file produced by Jellyfish:
     
         Typical usage
             draw_kmer_distribution_from_histo.py  -i ${JELLYFISH_HISTO_FILE}  -o ${OUTPUT_PREFIX} -w ${MINIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE} -g ${MAXIMUM_COVERAGE_LIMIT_FOR_NON_LOG_PICTURE} -e png
         
-        Parameter_description:
+
         

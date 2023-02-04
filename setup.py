@@ -29,14 +29,11 @@ def get_list_of_files(list_of_dirs_and_files, expression=None, recursive=True):
 
 
 setup(name='KrATER',
-      version='2.5',
+      version='2.6',
       packages=find_packages(),
       author='Sergei F. Kliver',
       url='https://github.com/mahajrod/KRATER',
       author_email='mahajrod@gmail.com',
       scripts=get_list_of_files("scripts/"),
-      install_requires=['scipy', 'numpy', 'matplotlib', 'biopython', 'routoolpa'],
+      install_requires=['scipy', 'numpy', 'matplotlib'],
       long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read())
-      #scripts=['draw_kmer_distribution_from_fastq.py',
-      #         'draw_kmer_distribution_from_histo.py',
-      #         'draw_kmer_distribution_from_jellyfish_database.py'])
