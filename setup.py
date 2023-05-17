@@ -28,12 +28,12 @@ def get_list_of_files(list_of_dirs_and_files, expression=None, recursive=True):
     return file_list
 
 
-setup(name='KrATER',
+setup(name='krater',
       version='2.7.0',
       packages=find_packages(),
       author='Sergei F. Kliver',
       url='https://github.com/mahajrod/KRATER',
       author_email='mahajrod@gmail.com',
       scripts=get_list_of_files("scripts/"),
-      install_requires=['scipy', 'numpy', 'matplotlib'],
+      install_requires=['scipy', 'numpy', 'matplotlib', ],
       long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read())
