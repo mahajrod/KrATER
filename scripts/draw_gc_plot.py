@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 __author__ = 'Sergei F. Kliver'
+
 import math
 import sys
+import shutil
 import argparse
 
 from pathlib import Path
@@ -62,7 +64,11 @@ parser.add_argument("-e", "--extension_list", action="store", dest="extension_li
 
 args = parser.parse_args()
 
-output_dir_path_dict = {subdir: Path(args.output_prefix).parent / subdir for subdir in ["tab"] + args.extension_list}
+args.output_prefix = Path(args.output_prefix)
+output_dir = args.output_prefix.parent
+output_dir_path_dict = {subdir: output_dir / subdir for subdir in ["tab"] + args.extension_list}
+output_prefix = args.output_prefix.name
+
 for subdir in output_dir_path_dict:
     FileRoutines.safe_mkdir(output_dir_path_dict[subdir])
 # ----- Parameters related to th detection of peaks ----
@@ -123,13 +129,13 @@ plt.suptitle("GC counts vs coverage(frequency) for {0}-mers".format(args.kmer_le
 plt.subplots_adjust(hspace=0.2, wspace=0.01, left=0.05, right=0.99)
 
 for ext in args.extension_list:
-    fig.savefig(output_dir_path_dict[ext] / "{0}.heatmap.{1}".format(args.output_prefix, ext))
+    fig.savefig(output_dir_path_dict[ext] / "{0}.heatmap.{1}".format(output_prefix, ext))
 
 for row in range(0, number_of_rows):
     for column in range(0, number_of_columns):
         ax_array[row][column].grid(visible=True,)
 for ext in args.extension_list:
-    fig.savefig(output_dir_path_dict[ext] / "{0}.heatmap.with_grid.{1}".format(args.output_prefix, ext))
+    fig.savefig(output_dir_path_dict[ext] / "{0}.heatmap.with_grid.{1}".format(output_prefix, ext))
 # ------------------------------------------------------------------
 
 # -------------------GC specific kmer histograms--------------------
@@ -146,13 +152,6 @@ if (n^2) < (args.kmer_length + 2):
         n += 1
 
 fig, ax_array = plt.subplots(n + 1, m, sharey=False, sharex=True, figsize=(4 * (n+1), 4 * m), dpi=300)  # Y axis is shared manually as there is a bug with ticks afrter dsharing axis - ticks continue be linked
-"""
-for row in range(0, n-1): # disconnect Y axis of last subplot in the first row from other subplots
-    for column in range(0, m):
-        if (row == 0) and (column == m-1):
-            ax_array[0][m-1].get_shared_y_axes().remove(ax_array[row][column])
-            ax_array[0][m-1].get_shared_x_axes().remove(ax_array[row][column]) 
-"""
 
 for gc in range(0, args.kmer_length + 1):
     ax_array[0][0].plot(raw_gc_coverage_count["coverage"][raw_gc_coverage_count["gc"] == gc],
@@ -195,12 +194,11 @@ if argrelextrema_imported:
         ax_array[0][1].axvline(ploidy * args.lambd, color=line_color, linestyle="dashed", zorder=0)
     ax_array[0][1].grid(visible=True)
     ax_array[0][1].sharey(ax_array[0][0])
-    gc_maximum_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_first_maximums.tab".format(args.output_prefix),
+    gc_maximum_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_first_maximums.tab".format(output_prefix),
                          sep="\t", index=False, header=True)
     all_gc_maximum_df = pd.concat(all_gc_maximum_df.values(), axis=0)
-    all_gc_maximum_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_all_maximums.tab".format(args.output_prefix),
+    all_gc_maximum_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_all_maximums.tab".format(output_prefix),
                              sep="\t", index=False, header=True)
-    #print(gc_maximum_df)
 
 raw_coverage_count = raw_gc_coverage_count[["coverage", "counts"]].groupby(["coverage"]).sum().reset_index(drop=False)
 
@@ -208,7 +206,7 @@ for gc in range(0, args.kmer_length + 1):
     ax_array[0][m-1].plot(raw_gc_coverage_count["coverage"][raw_gc_coverage_count["gc"] == gc],
                           raw_gc_coverage_count["counts"][raw_gc_coverage_count["gc"] == gc], color=color_list[gc])
     ax_array[0][m-1].plot(raw_gc_coverage_count["coverage"][raw_gc_coverage_count["gc"] == gc],
-                          raw_gc_coverage_count["counts"][raw_gc_coverage_count["gc"] == gc], color=color_list[gc], label="All")
+                          raw_gc_coverage_count["counts"][raw_gc_coverage_count["gc"] == gc], color=color_list[gc])
     for ploidy, line_color in zip(range(1, args.max_ploidy_line + 1), ploidy_line_color_list):
         ax_array[0][m-1].axvline(ploidy * args.lambd, color=line_color, linestyle="dashed")
 ax_array[0][m-1].set_xlim(xmin=min_coverage)
@@ -218,8 +216,8 @@ ax_array[0][m-1].yaxis.set_major_locator(MaxNLocator())
 ax_array[0][m-1].yaxis.set_tick_params(which='both', labelleft=True)
 ax_array[0][m-1].grid(visible=True, axis='both')
 ax_array[0][m-1].plot(raw_coverage_count["coverage"],
-                      raw_coverage_count["counts"], color="black")
-
+                      raw_coverage_count["counts"], color="black", label="All")
+ax_array[0][m-1].legend()
 
 for column in range(last_column_with_plots_in_first_row + 1, m - 1):
     ax_array[0][column].set_axis_off()
@@ -262,7 +260,7 @@ if (args.gap_coverage is not None) and (args.gap_coverage > 0):
     genome_part_df = pd.DataFrame.from_dict(genome_part_df, orient='index', columns=["size"])
     genome_part_df.index.name = "gc"
     genome_part_df.loc["Total"] = [sum(genome_part_df["size"])]
-    genome_part_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_fraction_size.tab".format(args.output_prefix),
+    genome_part_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_fraction_size.tab".format(output_prefix),
                           sep="\t", header=True, index=True)
 else:
     print("WARNING!!! Gap coverage was not set. Estimation of genome size for individual GC components is disabled...")
@@ -274,21 +272,32 @@ for xmax in close_right_border, far_right_border:
     ax_array[0][0].set_xlim(xmin=min_coverage, xmax=xmax)
     ax_array[0][m-1].set_xlim(xmin=min_coverage, xmax=xmax)
     for ext in args.extension_list:
-        fig.savefig(output_dir_path_dict[ext] / "{0}.gc_histogramms.max{1}.{2}".format(args.output_prefix, xmax, ext))
+        fig.savefig(output_dir_path_dict[ext] / "{0}.gc_histogramms.max{1}.{2}".format(output_prefix, xmax, ext))
 
 ax_array[0][0].set_xscale("log", base=10)
 ax_array[0][0].set_yscale("log", base=10)
+
 ax_array[0][m-1].set_xscale("log", base=10)
 ax_array[0][m-1].set_yscale("log", base=10)
 
 ax_array[0][0].set_xlim(xmin=min_coverage, xmax=max_coverage)
 ax_array[0][m-1].set_xlim(xmin=min_coverage, xmax=max_coverage)
 for ext in args.extension_list:
-    fig.savefig(output_dir_path_dict[ext] / "{0}.gc_histogramms.log.{1}".format(args.output_prefix, ext))
+    fig.savefig(output_dir_path_dict[ext] / "{0}.gc_histogramms.log.{1}".format(output_prefix, ext))
 
 for power in 3, 4, 5, 6:
     ax_array[0][0].set_xlim(xmin=min_coverage, xmax=10**power)
     ax_array[0][m-1].set_xlim(xmin=min_coverage, xmax=10**power)
     for ext in args.extension_list:
-        fig.savefig(output_dir_path_dict[ext] / "{0}.gc_histogramms.max{1}.log.{2}".format(args.output_prefix, 10 ** power, ext))
+        fig.savefig(output_dir_path_dict[ext] / "{0}.gc_histogramms.max{1}.log.{2}".format(output_prefix, 10 ** power, ext))
 
+for ext in args.extension_list:
+    shutil.copy(output_dir_path_dict[ext] / "{0}.heatmap.{1}".format(output_prefix, ext),
+                output_dir / "{0}.heatmap.{1}".format(output_prefix, ext),)
+    shutil.copy(output_dir_path_dict[ext] / "{0}.heatmap.with_grid.{1}".format(output_prefix, ext),
+                output_dir / "{0}.heatmap.with_grid.{1}".format(output_prefix, ext),)
+    shutil.copy(output_dir_path_dict[ext] / "{0}.gc_histogramms.log.{1}".format(output_prefix, ext),
+                output_dir / "{0}.gc_histogramms.log.{1}".format(output_prefix, ext))
+    for xmax in close_right_border, far_right_border:
+        shutil.copy(output_dir_path_dict[ext] / "{0}.gc_histogramms.max{1}.{2}".format(output_prefix, xmax, ext),
+                    output_dir / "{0}.gc_histogramms.max{1}.{2}".format(output_prefix, xmax, ext))
