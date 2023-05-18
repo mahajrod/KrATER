@@ -1,6 +1,6 @@
 package:
   name: 'krater'
-  version: "2.7.0"
+  version: "2.7.1"
 about:
   summary: "Kmer Analysis Tool Easy to run"
 source:
@@ -15,8 +15,9 @@ requirements:
     - matplotlib
   run:
     - python
-    - scipy
     - numpy
+    - scipy
+    - statsmodels
     - pandas
     - matplotlib
     - genomescope2
