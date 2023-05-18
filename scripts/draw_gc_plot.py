@@ -195,10 +195,12 @@ if argrelextrema_imported:
         ax_array[0][1].axvline(ploidy * args.lambd, color=line_color, linestyle="dashed", zorder=0)
     ax_array[0][1].grid(visible=True)
     ax_array[0][1].sharey(ax_array[0][0])
-    gc_maximum_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_first_maximums.tab".format(args.output_prefix))
+    gc_maximum_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_first_maximums.tab".format(args.output_prefix),
+                         sep="\t", index=False, header=True)
     all_gc_maximum_df = pd.concat(all_gc_maximum_df.values(), axis=0)
-    all_gc_maximum_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_all_maximums.tab".format(args.output_prefix))
-    print(gc_maximum_df)
+    all_gc_maximum_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_all_maximums.tab".format(args.output_prefix),
+                             sep="\t", index=False, header=True)
+    #print(gc_maximum_df)
 
 raw_coverage_count = raw_gc_coverage_count[["coverage", "counts"]].groupby(["coverage"]).sum().reset_index(drop=False)
 
@@ -224,7 +226,7 @@ for column in range(last_column_with_plots_in_first_row + 1, m - 1):
 
 last_column_with_plots_in_last_row = args.kmer_length % m
 
-genome_part_dict = {}
+genome_part_df = {}
 
 for gc in range(0, m * n):
     row = (gc // m) + 1
@@ -240,7 +242,7 @@ for gc in range(0, m * n):
         ax_array[row][column].legend()
         ax_array[row][column].grid(visible=True,)
         if (args.gap_coverage is not None) and (args.gap_coverage > 0):
-            genome_part_dict[gc] = np.sum(np.multiply(raw_gc_coverage_count["coverage"][(raw_gc_coverage_count["gc"] == gc) & (raw_gc_coverage_count["coverage"] >= args.gap_coverage)],
+            genome_part_df[gc] = np.sum(np.multiply(raw_gc_coverage_count["coverage"][(raw_gc_coverage_count["gc"] == gc) & (raw_gc_coverage_count["coverage"] >= args.gap_coverage)],
                                                       raw_gc_coverage_count["counts"][(raw_gc_coverage_count["gc"] == gc) & (raw_gc_coverage_count["coverage"] >= args.gap_coverage)])) / 2 / args.lambd
 
         for ploidy, line_color in zip(range(1, args.max_ploidy_line + 1), ploidy_line_color_list):
@@ -255,6 +257,15 @@ for gc in range(0, m * n):
     ax_array[row][column].set_xlim(xmin=min_coverage)
     plt.suptitle("GC-specific counts vs coverage(frequency) for {0}-mers".format(args.kmer_length),
                  fontsize=32, fontweight="bold")
+
+if (args.gap_coverage is not None) and (args.gap_coverage > 0):
+    genome_part_df = pd.DataFrame.from_dict(genome_part_df, orient='index', columns=["size"])
+    genome_part_df.index.name = "gc"
+    genome_part_df.loc["Total"] = [sum(genome_part_df["size"])]
+    genome_part_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_fraction_size.tab".format(args.output_prefix),
+                          sep="\t", header=True, index=True)
+else:
+    print("WARNING!!! Gap coverage was not set. Estimation of genome size for individual GC components is disabled...")
 
 ax_array[0][0].set_ylim(ymin=1)
 plt.subplots_adjust(hspace=0.2, wspace=0.2, left=0.05, right=0.95, bottom=0.05, top=0.95)
