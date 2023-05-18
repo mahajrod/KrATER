@@ -133,6 +133,10 @@ for ext in args.extension_list:
 # ------------------------------------------------------------------
 
 # -------------------GC specific kmer histograms--------------------
+colors = distinctipy.get_colors(args.kmer_length + 1)
+color_list = list(map(rgb_tuple_to_hex, colors))
+
+ploidy_line_color_list = ["red", "green", "blue", "black"] + (["black"] * (args.max_ploidy_line - 4))
 
 n = int(math.sqrt(args.kmer_length + 2))
 m = n
@@ -140,10 +144,6 @@ if (n^2) < (args.kmer_length + 2):
     m = n + 1
     if (m * n) < (args.kmer_length + 2):
         n += 1
-
-colors = distinctipy.get_colors(args.kmer_length + 1)
-color_list = list(map(rgb_tuple_to_hex, colors))
-
 
 fig, ax_array = plt.subplots(n + 1, m, sharey=False, sharex=True, figsize=(4 * (n+1), 4 * m), dpi=300)  # Y axis is shared manually as there is a bug with ticks afrter dsharing axis - ticks continue be linked
 """
@@ -157,6 +157,9 @@ for row in range(0, n-1): # disconnect Y axis of last subplot in the first row f
 for gc in range(0, args.kmer_length + 1):
     ax_array[0][0].plot(raw_gc_coverage_count["coverage"][raw_gc_coverage_count["gc"] == gc],
                         raw_gc_coverage_count["counts"][raw_gc_coverage_count["gc"] == gc], color=color_list[gc])
+
+for ploidy, line_color in zip(range(1, args.max_ploidy_line + 1), ploidy_line_color_list):
+    ax_array[0][0].axvline(ploidy * args.lambd, color=line_color, linestyle="dashed", zorder=1)
 ax_array[0][0].set_xlim(xmin=min_coverage)
 ax_array[0][0].set_ylabel("counts", fontsize=20)
 ax_array[0][0].grid(visible=True)
@@ -188,6 +191,8 @@ if argrelextrema_imported:
     ax_array[0][1].scatter(gc_maximum_df["coverage"],
                            gc_maximum_df["counts"],
                            color=color_list)
+    for ploidy, line_color in zip(range(1, args.max_ploidy_line + 1), ploidy_line_color_list):
+        ax_array[0][1].axvline(ploidy * args.lambd, color=line_color, linestyle="dashed", zorder=0)
     ax_array[0][1].grid(visible=True)
     ax_array[0][1].sharey(ax_array[0][0])
     gc_maximum_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_first_maximums.tab".format(args.output_prefix))
@@ -202,6 +207,8 @@ for gc in range(0, args.kmer_length + 1):
                           raw_gc_coverage_count["counts"][raw_gc_coverage_count["gc"] == gc], color=color_list[gc])
     ax_array[0][m-1].plot(raw_gc_coverage_count["coverage"][raw_gc_coverage_count["gc"] == gc],
                           raw_gc_coverage_count["counts"][raw_gc_coverage_count["gc"] == gc], color=color_list[gc], label="All")
+    for ploidy, line_color in zip(range(1, args.max_ploidy_line + 1), ploidy_line_color_list):
+        ax_array[0][m-1].axvline(ploidy * args.lambd, color=line_color, linestyle="dashed")
 ax_array[0][m-1].set_xlim(xmin=min_coverage)
 ax_array[0][m-1].set_ylim(ymin=1, ymax=1.1 * max(raw_coverage_count["counts"]))
 ax_array[0][m-1].set_ylabel("counts", fontsize=20)
@@ -214,9 +221,6 @@ ax_array[0][m-1].plot(raw_coverage_count["coverage"],
 
 for column in range(last_column_with_plots_in_first_row + 1, m - 1):
     ax_array[0][column].set_axis_off()
-
-ploidy_line_color_list = ["red", "green", "blue", "black"]
-ploidy_line_color_list += ["black"] * (args.max_ploidy_line - 4)
 
 last_column_with_plots_in_last_row = args.kmer_length % m
 
