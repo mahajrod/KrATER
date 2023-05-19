@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 __author__ = 'Sergei F. Kliver'
-
+import sys
 from pathlib import Path
 import numpy as np
 
@@ -8,7 +8,7 @@ try:
     argrelextrema_imported = True
     from scipy.signal import argrelextrema
 except:
-    print("WARNING!!! Impossible to import argrelextrema function form scipy.signal. Related functionality is disabled.")
+    sys.stderr.write("WARNING!!! Impossible to import argrelextrema function form scipy.signal. Related functionality is disabled.\n")
     argrelextrema_imported = False
 
 import matplotlib.pyplot as plt

@@ -20,7 +20,7 @@ try:
     argrelextrema_imported = True
     from scipy.signal import argrelextrema
 except:
-    print("WARNING!!! Impossible to import argrelextrema function form scipy.signal. Related functionality is disabled.")
+    sys.stderr.write("WARNING!!! Impossible to import argrelextrema function form scipy.signal. Related functionality is disabled.\n")
     argrelextrema_imported = False
 
 from KRATER.Routines import FileRoutines
@@ -263,7 +263,7 @@ if (args.gap_coverage is not None) and (args.gap_coverage > 0):
     genome_part_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_fraction_size.tab".format(output_prefix),
                           sep="\t", header=True, index=True)
 else:
-    print("WARNING!!! Gap coverage was not set. Estimation of genome size for individual GC components is disabled...")
+    sys.stderr.write("WARNING!!! Gap coverage was not set. Estimation of genome size for individual GC components is disabled...\n")
 
 ax_array[0][0].set_ylim(ymin=1)
 plt.subplots_adjust(hspace=0.2, wspace=0.2, left=0.05, right=0.95, bottom=0.05, top=0.95)
