@@ -23,7 +23,7 @@ except:
     # emergency import
     from KRATER.Routines.JellyfishRoutines import argrelextrema
 
-from KRATER.Routines import FileRoutines
+from KRATER.Routines import FileRoutines, JellyfishRoutines
 
 
 def rgb_tuple_to_hex(rgb_tuple):
@@ -151,7 +151,7 @@ if (n^2) < (args.kmer_length + 2):
     if (m * n) < (args.kmer_length + 2):
         n += 1
 
-fig, ax_array = plt.subplots(n + 1, m, sharey=False, sharex=True, figsize=(4 * (n+1), 4 * m), dpi=300)  # Y axis is shared manually as there is a bug with ticks afrter dsharing axis - ticks continue be linked
+fig, ax_array = plt.subplots(n + 1, m, sharey=False, sharex=False, figsize=(4 * (n+1), 4 * m), dpi=300)  # Y axis is shared manually as there is a bug with ticks afrter dsharing axis - ticks continue be linked
 
 for gc in range(0, args.kmer_length + 1):
     ax_array[0][0].plot(raw_gc_coverage_count["coverage"][raw_gc_coverage_count["gc"] == gc],
@@ -194,6 +194,8 @@ for ploidy, line_color in zip(range(1, args.max_ploidy_line + 1), ploidy_line_co
     ax_array[0][1].axvline(ploidy * args.lambd, color=line_color, linestyle="dashed", zorder=0)
 ax_array[0][1].grid(visible=True)
 ax_array[0][1].sharey(ax_array[0][0])
+ax_array[0][1].sharex(ax_array[0][0])
+
 gc_maximum_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_first_maximums.tab".format(output_prefix),
                      sep="\t", index=False, header=True)
 all_gc_maximum_df = pd.concat(all_gc_maximum_df.values(), axis=0)
@@ -201,7 +203,19 @@ all_gc_maximum_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_all_maximums.tab"
                          sep="\t", index=False, header=True)
 # end of if
 raw_coverage_count = raw_gc_coverage_count[["coverage", "counts"]].groupby(["coverage"]).sum().reset_index(drop=False)
+if args.gap_coverage is None:
+    all_local_minimums_idx_list = argrelextrema(np.array(raw_coverage_count["counts"]), np.less, order=2, mode=mode)[0]
+    all_local_minimums_idx_list = all_local_minimums_idx_list if all_local_minimums_idx_list[0] != 0 else all_local_minimums_idx_list[1:]
+    all_local_minimums_counts = raw_coverage_count["counts"].iloc[all_local_minimums_idx_list]
+    all_local_minimums_coverage = raw_coverage_count["coverage"].iloc[all_local_minimums_idx_list]
+    args.gap_coverage = all_local_minimums_coverage.iloc[0]
+all_genome_size = sum(np.multiply(raw_coverage_count["counts"][raw_coverage_count["coverage"] >= args.gap_coverage],
+                                  raw_coverage_count["coverage"][raw_coverage_count["coverage"] >= args.gap_coverage])) / 2 / args.lambd
 
+size, half_interval, unit = JellyfishRoutines.get_human_readable_genome_size(all_genome_size,
+                                                                             genome_size_half_conf_len=None)
+
+ax_array[0][m-1].sharex(ax_array[0][0])
 for gc in range(0, args.kmer_length + 1):
     ax_array[0][m-1].plot(raw_gc_coverage_count["coverage"][raw_gc_coverage_count["gc"] == gc],
                           raw_gc_coverage_count["counts"][raw_gc_coverage_count["gc"] == gc], color=color_list[gc])
@@ -209,6 +223,7 @@ for gc in range(0, args.kmer_length + 1):
                           raw_gc_coverage_count["counts"][raw_gc_coverage_count["gc"] == gc], color=color_list[gc])
     for ploidy, line_color in zip(range(1, args.max_ploidy_line + 1), ploidy_line_color_list):
         ax_array[0][m-1].axvline(ploidy * args.lambd, color=line_color, linestyle="dashed")
+
 ax_array[0][m-1].set_xlim(xmin=min_coverage)
 ax_array[0][m-1].set_ylim(ymin=1, ymax=1.1 * max(raw_coverage_count["counts"]))
 ax_array[0][m-1].set_ylabel("counts", fontsize=20)
@@ -216,11 +231,8 @@ ax_array[0][m-1].yaxis.set_major_locator(MaxNLocator())
 ax_array[0][m-1].yaxis.set_tick_params(which='both', labelleft=True)
 ax_array[0][m-1].grid(visible=True, axis='both')
 ax_array[0][m-1].plot(raw_coverage_count["coverage"],
-                      raw_coverage_count["counts"], color="black", label="All")
+                      raw_coverage_count["counts"], color="black", label="All: {0} {1}".format(size, unit))
 ax_array[0][m-1].legend()
-
-for column in range(last_column_with_plots_in_first_row + 1, m - 1):
-    ax_array[0][column].set_axis_off()
 
 last_column_with_plots_in_last_row = args.kmer_length % m
 
@@ -233,15 +245,18 @@ for gc in range(0, m * n):
     if gc > args.kmer_length:
         ax_array[row][column].set_axis_off()
     else:
+        genome_part_df[gc] = np.sum(np.multiply(raw_gc_coverage_count["coverage"][(raw_gc_coverage_count["gc"] == gc) & (raw_gc_coverage_count["coverage"] >= args.gap_coverage)],
+                                                raw_gc_coverage_count["counts"][(raw_gc_coverage_count["gc"] == gc) & (raw_gc_coverage_count["coverage"] >= args.gap_coverage)])) / 2 / args.lambd
+        size, half_interval, unit = JellyfishRoutines.get_human_readable_genome_size(genome_part_df[gc],
+                                                                                     genome_size_half_conf_len=None)
+
         ax_array[row][column].sharey(ax_array[0][0])
+        ax_array[row][column].sharex(ax_array[0][0])
         ax_array[row][column].plot(raw_gc_coverage_count["coverage"][raw_gc_coverage_count["gc"] == gc],
                                    raw_gc_coverage_count["counts"][raw_gc_coverage_count["gc"] == gc],
-                                   label="GC: %0i" % gc, color=color_list[gc])
+                                   label="GC: %0i\n%s %s" % (gc, size, unit), color=color_list[gc])
         ax_array[row][column].legend()
         ax_array[row][column].grid(visible=True,)
-        if (args.gap_coverage is not None) and (args.gap_coverage > 0):
-            genome_part_df[gc] = np.sum(np.multiply(raw_gc_coverage_count["coverage"][(raw_gc_coverage_count["gc"] == gc) & (raw_gc_coverage_count["coverage"] >= args.gap_coverage)],
-                                                      raw_gc_coverage_count["counts"][(raw_gc_coverage_count["gc"] == gc) & (raw_gc_coverage_count["coverage"] >= args.gap_coverage)])) / 2 / args.lambd
 
         for ploidy, line_color in zip(range(1, args.max_ploidy_line + 1), ploidy_line_color_list):
             ax_array[row][column].axvline(ploidy * args.lambd, color=line_color, linestyle="dashed")
@@ -256,7 +271,7 @@ for gc in range(0, m * n):
     plt.suptitle("GC-specific counts vs coverage(frequency) for {0}-mers".format(args.kmer_length),
                  fontsize=32, fontweight="bold")
 
-if (args.gap_coverage is not None) and (args.gap_coverage > 0):
+if args.gap_coverage > 0:
     genome_part_df = pd.DataFrame.from_dict(genome_part_df, orient='index', columns=["size"])
     genome_part_df.index.name = "gc"
     genome_part_df.loc["Total"] = [sum(genome_part_df["size"])]
@@ -266,13 +281,23 @@ else:
     sys.stderr.write("WARNING!!! Gap coverage was not set. Estimation of genome size for individual GC components is disabled...\n")
 
 ax_array[0][0].set_ylim(ymin=1)
-plt.subplots_adjust(hspace=0.2, wspace=0.2, left=0.05, right=0.95, bottom=0.05, top=0.95)
+plt.subplots_adjust(hspace=0.25, wspace=0.2, left=0.05, right=0.95, bottom=0.05, top=0.95)
 
 for xmax in close_right_border, far_right_border:
     ax_array[0][0].set_xlim(xmin=min_coverage, xmax=xmax)
     ax_array[0][m-1].set_xlim(xmin=min_coverage, xmax=xmax)
     for ext in args.extension_list:
         fig.savefig(output_dir_path_dict[ext] / "{0}.gc_histogramms.max{1}.{2}".format(output_prefix, xmax, ext))
+
+ax_array[0][2].plot(genome_part_df.index[:-1], genome_part_df["size"].iloc[:-1] / 10**6)
+ax_array[0][2].set_xlabel("gc", fontsize=20)
+ax_array[0][2].set_ylabel("size, Mbp", fontsize=20)
+ax_array[0][2].set_xlim(xmin=0, xmax=args.kmer_length)
+ax_array[0][2].grid(visible=True,)
+last_column_with_plots_in_first_row += 1
+
+for column in range(last_column_with_plots_in_first_row + 1, m - 1):
+    ax_array[0][column].set_axis_off()
 
 ax_array[0][0].set_xscale("log", base=10)
 ax_array[0][0].set_yscale("log", base=10)
@@ -282,6 +307,7 @@ ax_array[0][m-1].set_yscale("log", base=10)
 
 ax_array[0][0].set_xlim(xmin=min_coverage, xmax=max_coverage)
 ax_array[0][m-1].set_xlim(xmin=min_coverage, xmax=max_coverage)
+
 for ext in args.extension_list:
     fig.savefig(output_dir_path_dict[ext] / "{0}.gc_histogramms.log.{1}".format(output_prefix, ext))
 

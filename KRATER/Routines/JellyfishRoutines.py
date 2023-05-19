@@ -203,6 +203,13 @@ class JellyfishRoutines(Tool):
             if final_estimated_genome_size is None:
                 legend = "NA"
             else:
+
+                size, half_interval, unit = self.get_human_readable_genome_size(final_estimated_genome_size, genome_size_half_conf_len=final_estimated_genome_size_half_conf_len if show_confidence_interval else None)
+                legend = "{0}: {1}{2} {3}".format(label,
+                                                  size,
+                                                  half_interval if half_interval is not None else "",
+                                                  unit)
+                """
                 size_in_terabases = float(final_estimated_genome_size) / float(10 ** 12)
                 size_half_conf_len_in_terabases = float(final_estimated_genome_size_half_conf_len) / float(10 ** 12)
                 size_in_gigabases = float(final_estimated_genome_size) / float(10 ** 9)
@@ -232,7 +239,7 @@ class JellyfishRoutines(Tool):
                     if show_confidence_interval:
                         legend += "±%.2f" % size_half_conf_len_in_kilobases
                     legend += " Kbp"
-
+                """
             for index in range(3, 5):
                 figure = plt.figure(index, figsize=(5, 10))
                 subplot_list = []
@@ -278,7 +285,37 @@ class JellyfishRoutines(Tool):
                 plt.savefig("%s.%s" % ("%s.peaks_and_gaps" % output_prefix if index == 4 else output_prefix, extension))
 
             plt.close()
+    
+    @staticmethod
+    def get_human_readable_genome_size(genome_size, genome_size_half_conf_len=None):
+        size_in_terabases = float(genome_size) / float(10 ** 12)
+        size_half_conf_len_in_terabases = (float(genome_size_half_conf_len) / float(10 ** 12)) if genome_size_half_conf_len is not None else None
+        size_in_gigabases = float(genome_size) / float(10 ** 9)
+        size_half_conf_len_in_gigabases = (float(genome_size_half_conf_len) / float(10 ** 9)) if genome_size_half_conf_len is not None else None
+        size_in_megabases = float(genome_size) / float(10 ** 6)
+        size_half_conf_len_in_megabases = (float(genome_size_half_conf_len) / float(10 ** 6)) if genome_size_half_conf_len is not None else None
+        size_in_kilobases = float(genome_size) / float(10 ** 3)
+        size_half_conf_len_in_kilobases = (float(genome_size_half_conf_len) / float(10 ** 3)) if genome_size_half_conf_len is not None else None
 
+        if size_in_terabases > 1:
+            size = "%.2f" % size_in_terabases
+            half_interval = ("±%.2f" % size_half_conf_len_in_terabases) if genome_size_half_conf_len is not None else None
+            unit = "Tbp"
+        elif size_in_gigabases > 1:
+            size = "%.2f" % size_in_gigabases
+            half_interval = ("±%.2f" % size_half_conf_len_in_gigabases) if genome_size_half_conf_len is not None else None
+            unit = " Gbp"
+        elif size_in_megabases > 1:
+            size = "%.2f" % size_in_megabases
+            half_interval = ("±%.2f" % size_half_conf_len_in_megabases) if genome_size_half_conf_len is not None else None
+            unit = " Mbp"
+        else:
+            size = "%.2f" % size_in_kilobases
+            half_interval = ("±%.2f" % size_half_conf_len_in_kilobases) if genome_size_half_conf_len is not None else None
+            unit = " Kbp"
+
+        return size, half_interval, unit
+    
     @staticmethod
     def find_peak_indexes_from_histo(counts, order=3, mode="wrap"):
         """
