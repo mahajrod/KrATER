@@ -17,11 +17,11 @@ from matplotlib.ticker import MaxNLocator
 from distinctipy import distinctipy
 
 try:
-    argrelextrema_imported = True
     from scipy.signal import argrelextrema
 except:
     sys.stderr.write("WARNING!!! Impossible to import argrelextrema function form scipy.signal. Related functionality is disabled.\n")
-    argrelextrema_imported = False
+    # emergency import
+    from KRATER.Routines.JellyfishRoutines import argrelextrema
 
 from KRATER.Routines import FileRoutines
 
@@ -168,38 +168,38 @@ last_column_with_plots_in_first_row = 0
 gc_maximum_df = []
 all_gc_maximum_df = {}
 # ----- Maximum counts for
-if argrelextrema_imported:
-    for gc in range(0, args.kmer_length + 1):
-        gc_df = raw_gc_coverage_count[raw_gc_coverage_count["gc"] == gc]
-        local_maximums_idx_list = argrelextrema(np.array(gc_df["counts"]), np.greater, order=order, mode=mode)[0]
-        local_maximums_idx_list = local_maximums_idx_list if local_maximums_idx_list[0] != 0 else local_maximums_idx_list[1:]
-        local_minimums_idx_list = argrelextrema(np.array(gc_df["counts"]), np.less, order=order, mode=mode)[0]
-        local_minimums_idx_list = local_minimums_idx_list if local_minimums_idx_list[0] != 0 else local_minimums_idx_list[1:]
+#if argrelextrema_imported:
+for gc in range(0, args.kmer_length + 1):
+    gc_df = raw_gc_coverage_count[raw_gc_coverage_count["gc"] == gc]
+    local_maximums_idx_list = argrelextrema(np.array(gc_df["counts"]), np.greater, order=order, mode=mode)[0]
+    local_maximums_idx_list = local_maximums_idx_list if local_maximums_idx_list[0] != 0 else local_maximums_idx_list[1:]
+    local_minimums_idx_list = argrelextrema(np.array(gc_df["counts"]), np.less, order=order, mode=mode)[0]
+    local_minimums_idx_list = local_minimums_idx_list if local_minimums_idx_list[0] != 0 else local_minimums_idx_list[1:]
 
-        local_maximums_counts = gc_df["counts"].iloc[local_maximums_idx_list]
-        local_maximums_coverage = gc_df["coverage"].iloc[local_maximums_idx_list]
-        all_gc_maximum_df[gc] = pd.concat([local_maximums_counts, local_maximums_coverage], axis=1)
-        all_gc_maximum_df[gc]["gc"] = gc
-        all_gc_maximum_df[gc] = all_gc_maximum_df[gc][["coverage", "gc", "counts"]]
-        gc_maximum_df.append([local_maximums_coverage.iloc[0], gc, local_maximums_counts.iloc[0]])
+    local_maximums_counts = gc_df["counts"].iloc[local_maximums_idx_list]
+    local_maximums_coverage = gc_df["coverage"].iloc[local_maximums_idx_list]
+    all_gc_maximum_df[gc] = pd.concat([local_maximums_counts, local_maximums_coverage], axis=1)
+    all_gc_maximum_df[gc]["gc"] = gc
+    all_gc_maximum_df[gc] = all_gc_maximum_df[gc][["coverage", "gc", "counts"]]
+    gc_maximum_df.append([local_maximums_coverage.iloc[0], gc, local_maximums_counts.iloc[0]])
 
-    gc_maximum_df = pd.DataFrame(gc_maximum_df, columns=["coverage", "gc", "counts"])
-    last_column_with_plots_in_first_row += 1
-    ax_array[0][1].plot(gc_maximum_df["coverage"],
-                        gc_maximum_df["counts"], )
-    ax_array[0][1].scatter(gc_maximum_df["coverage"],
-                           gc_maximum_df["counts"],
-                           color=color_list)
-    for ploidy, line_color in zip(range(1, args.max_ploidy_line + 1), ploidy_line_color_list):
-        ax_array[0][1].axvline(ploidy * args.lambd, color=line_color, linestyle="dashed", zorder=0)
-    ax_array[0][1].grid(visible=True)
-    ax_array[0][1].sharey(ax_array[0][0])
-    gc_maximum_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_first_maximums.tab".format(output_prefix),
+gc_maximum_df = pd.DataFrame(gc_maximum_df, columns=["coverage", "gc", "counts"])
+last_column_with_plots_in_first_row += 1
+ax_array[0][1].plot(gc_maximum_df["coverage"],
+                    gc_maximum_df["counts"], )
+ax_array[0][1].scatter(gc_maximum_df["coverage"],
+                       gc_maximum_df["counts"],
+                       color=color_list)
+for ploidy, line_color in zip(range(1, args.max_ploidy_line + 1), ploidy_line_color_list):
+    ax_array[0][1].axvline(ploidy * args.lambd, color=line_color, linestyle="dashed", zorder=0)
+ax_array[0][1].grid(visible=True)
+ax_array[0][1].sharey(ax_array[0][0])
+gc_maximum_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_first_maximums.tab".format(output_prefix),
+                     sep="\t", index=False, header=True)
+all_gc_maximum_df = pd.concat(all_gc_maximum_df.values(), axis=0)
+all_gc_maximum_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_all_maximums.tab".format(output_prefix),
                          sep="\t", index=False, header=True)
-    all_gc_maximum_df = pd.concat(all_gc_maximum_df.values(), axis=0)
-    all_gc_maximum_df.to_csv(output_dir_path_dict["tab"] / "{0}.gc_all_maximums.tab".format(output_prefix),
-                             sep="\t", index=False, header=True)
-
+# end of if
 raw_coverage_count = raw_gc_coverage_count[["coverage", "counts"]].groupby(["coverage"]).sum().reset_index(drop=False)
 
 for gc in range(0, args.kmer_length + 1):

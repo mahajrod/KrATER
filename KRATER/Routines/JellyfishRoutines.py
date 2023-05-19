@@ -5,11 +5,40 @@ from pathlib import Path
 import numpy as np
 
 try:
-    argrelextrema_imported = True
     from scipy.signal import argrelextrema
 except:
     sys.stderr.write("WARNING!!! Impossible to import argrelextrema function form scipy.signal. Related functionality is disabled.\n")
-    argrelextrema_imported = False
+
+    # emergency code copied from
+    def _boolrelextrema(data, comparator, axis=0, order=1, mode='clip'):
+
+        if (int(order) != order) or (order < 1):
+            raise ValueError('Order must be an int >= 1')
+
+        datalen = data.shape[axis]
+        locs = np.arange(0, datalen)
+
+        results = np.ones(data.shape, dtype=bool)
+        main = data.take(locs, axis=axis, mode=mode)
+        for shift in range(1, order + 1):
+            plus = data.take(locs + shift, axis=axis, mode=mode)
+            minus = data.take(locs - shift, axis=axis, mode=mode)
+            results &= comparator(main, plus)
+            results &= comparator(main, minus)
+            if ~results.any():
+                return results
+        return results
+
+    def argrelmin(data, axis=0, order=1, mode='clip'):
+        return argrelextrema(data, np.less, axis, order, mode)
+
+    def argrelmax(data, axis=0, order=1, mode='clip'):
+
+        return argrelextrema(data, np.greater, axis, order, mode)
+
+    def argrelextrema(data, comparator, axis=0, order=1, mode='clip'):
+        results = _boolrelextrema(data, comparator, axis, order, mode)
+        return np.nonzero(results)
 
 import matplotlib.pyplot as plt
 
@@ -70,50 +99,50 @@ class JellyfishRoutines(Tool):
                     genomescope2_genomesize_max, genomescope2_genomesize_half_conf_len = \
                         list(map(float, genomescope2_stat_fd.readline().strip().split("\t")[1:]))
 
-            if argrelextrema_imported:
+            #if argrelextrema_imported:
 
-                maximums_to_show, minimums_to_show, \
-                    unique_peak_borders, number_of_distinct_kmers, \
-                    number_of_distinct_kmers_with_errors,\
-                    total_number_of_kmers, total_number_of_kmers_with_errors, \
-                    estimated_genome_size, max_estimated_genome_size, min_estimated_genome_size, \
-                    estimated_genome_size_half_conf_len = self.extract_parameters_from_histo(counts, bins,
-                                                                                             "{}.{}".format(output_prefix, label),
-                                                                                             order=order,
-                                                                                             mode=mode,
-                                                                                             check_peaks_coef=check_peaks_coef,
-                                                                                             use_second_peak_for_genome_size_estimation=use_second_peak_for_genome_size_estimation)
-                parameters_list.append((maximums_to_show,
-                                        minimums_to_show,
-                                        unique_peak_borders,
-                                        number_of_distinct_kmers,
-                                        number_of_distinct_kmers_with_errors,
-                                        total_number_of_kmers,
-                                        total_number_of_kmers_with_errors,
-                                        estimated_genome_size,
-                                        max_estimated_genome_size,
-                                        min_estimated_genome_size,
-                                        estimated_genome_size_half_conf_len))
+            maximums_to_show, minimums_to_show, \
+                unique_peak_borders, number_of_distinct_kmers, \
+                number_of_distinct_kmers_with_errors,\
+                total_number_of_kmers, total_number_of_kmers_with_errors, \
+                estimated_genome_size, max_estimated_genome_size, min_estimated_genome_size, \
+                estimated_genome_size_half_conf_len = self.extract_parameters_from_histo(counts, bins,
+                                                                                         "{}.{}".format(output_prefix, label),
+                                                                                         order=order,
+                                                                                         mode=mode,
+                                                                                         check_peaks_coef=check_peaks_coef,
+                                                                                         use_second_peak_for_genome_size_estimation=use_second_peak_for_genome_size_estimation)
+            parameters_list.append((maximums_to_show,
+                                    minimums_to_show,
+                                    unique_peak_borders,
+                                    number_of_distinct_kmers,
+                                    number_of_distinct_kmers_with_errors,
+                                    total_number_of_kmers,
+                                    total_number_of_kmers_with_errors,
+                                    estimated_genome_size,
+                                    max_estimated_genome_size,
+                                    min_estimated_genome_size,
+                                    estimated_genome_size_half_conf_len))
 
-                unique_peak_width = unique_peak_borders[1] - unique_peak_borders[0] + 1
+            unique_peak_width = unique_peak_borders[1] - unique_peak_borders[0] + 1
 
-                unique_peak_borders_mean_multiplicity = self.mean_from_bins(bins[unique_peak_borders[0]: unique_peak_borders[1]+1],
-                                                                            counts[unique_peak_borders[0]: unique_peak_borders[1]+1])
+            unique_peak_borders_mean_multiplicity = self.mean_from_bins(bins[unique_peak_borders[0]: unique_peak_borders[1]+1],
+                                                                        counts[unique_peak_borders[0]: unique_peak_borders[1]+1])
 
-                fraction_of_distinct_kmers_with_errors = float(number_of_distinct_kmers_with_errors)/float(number_of_distinct_kmers)
-                fraction_of_kmers_with_errors = float(total_number_of_kmers_with_errors)/float(total_number_of_kmers)
-            else:
-                maximums_to_show, minimums_to_show, \
-                    unique_peak_borders, number_of_distinct_kmers, \
-                    number_of_distinct_kmers_with_errors,\
-                    total_number_of_kmers, total_number_of_kmers_with_errors, \
-                    estimated_genome_size, max_estimated_genome_size, min_estimated_genome_size, \
-                    estimated_genome_size_half_conf_len, \
-                    unique_peak_width, \
-                    unique_peak_borders_mean_multiplicity, \
-                    fraction_of_distinct_kmers_with_errors, \
-                    fraction_of_kmers_with_errors = [None] * 15
-
+            fraction_of_distinct_kmers_with_errors = float(number_of_distinct_kmers_with_errors)/float(number_of_distinct_kmers)
+            fraction_of_kmers_with_errors = float(total_number_of_kmers_with_errors)/float(total_number_of_kmers)
+            #else:
+            #    maximums_to_show, minimums_to_show, \
+            #        unique_peak_borders, number_of_distinct_kmers, \
+            #        number_of_distinct_kmers_with_errors,\
+            #        total_number_of_kmers, total_number_of_kmers_with_errors, \
+            #        estimated_genome_size, max_estimated_genome_size, min_estimated_genome_size, \
+            #        estimated_genome_size_half_conf_len, \
+            #        unique_peak_width, \
+            #        unique_peak_borders_mean_multiplicity, \
+            #        fraction_of_distinct_kmers_with_errors, \
+            #        fraction_of_kmers_with_errors = [None] * 15
+            # end of if
             general_stats = "Sample\t%s\n" % label
             general_stats += "Number of distinct kmers\t%s\n" % (str(number_of_distinct_kmers) if number_of_distinct_kmers is not None else "NA")
             general_stats += "Number of distinct kmers with errors\t%s\n" % (str(number_of_distinct_kmers_with_errors) if number_of_distinct_kmers_with_errors is not None else "NA")
