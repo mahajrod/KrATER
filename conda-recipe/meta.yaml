@@ -1,6 +1,6 @@
 package:
   name: 'krater'
-  version: "2.7.9"
+  version: "2.7.10"
 about:
   summary: "Kmer Analysis Tool Easy to run"
 source:
@@ -20,6 +20,8 @@ requirements:
     - statsmodels
     - pandas
     - matplotlib
+    - jellyfish>=2
+    - meryl==1.3
     - genomescope2
 build:
   script: python setup.py install

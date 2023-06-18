@@ -146,7 +146,7 @@ ploidy_line_color_list = ["red", "green", "blue", "black"] + (["black"] * (args.
 
 n = int(math.sqrt(args.kmer_length + 2))
 m = n
-if (n^2) < (args.kmer_length + 2):
+if (n ^ 2) < (args.kmer_length + 2):
     m = n + 1
     if (m * n) < (args.kmer_length + 2):
         n += 1
