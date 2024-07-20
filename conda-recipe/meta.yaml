@@ -1,6 +1,6 @@
 package:
   name: 'krater'
-  version: "2.7.10"
+  version: "2.7.11"
 about:
   summary: "Kmer Analysis Tool Easy to run"
 source:
@@ -17,7 +17,6 @@ requirements:
     - python
     - numpy
     - scipy
-    - statsmodels
     - pandas
     - matplotlib
     - jellyfish>=2
