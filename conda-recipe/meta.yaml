@@ -1,6 +1,6 @@
 package:
   name: 'krater'
-  version: "2.7.11"
+  version: "2.7.12"
 about:
   summary: "Kmer Analysis Tool Easy to run"
 source:
