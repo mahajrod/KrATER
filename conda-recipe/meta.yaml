@@ -10,13 +10,12 @@ requirements:
     - python {{ python }}
     - pip
     - setuptools
-    - numpy
+    - numpy>=2
     - pandas
     - matplotlib
   run:
     - python
-    - numpy
-    - scipy
+    - numpy>=2
     - pandas
     - matplotlib
     - jellyfish>=2

@@ -27,11 +27,11 @@ II. Installation
         - install python libraries(not necessary if you going to install KrATER via pip)
             - run following command for global installation
         
-                sudo pip install matplotlib numpy scipy 
+                sudo pip install matplotlib numpy matplotlib
             
             - or following command for local installation if you don't have root permissions
         
-                pip install --user matplotlib numpy scipy
+                pip install --user matplotlib numpy matplotlib
         
         - install modified Genomescope2 from https://github.com/mahajrod/genomescope2.0
         

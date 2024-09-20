@@ -4,42 +4,6 @@ import sys
 from pathlib import Path
 import numpy as np
 
-try:
-    from scipy.signal import argrelextrema
-except:
-    sys.stderr.write("WARNING!!! Impossible to import argrelextrema function form scipy.signal. Related functionality is disabled.\n")
-
-    # emergency code copied from
-    def _boolrelextrema(data, comparator, axis=0, order=1, mode='clip'):
-
-        if (int(order) != order) or (order < 1):
-            raise ValueError('Order must be an int >= 1')
-
-        datalen = data.shape[axis]
-        locs = np.arange(0, datalen)
-
-        results = np.ones(data.shape, dtype=bool)
-        main = data.take(locs, axis=axis, mode=mode)
-        for shift in range(1, order + 1):
-            plus = data.take(locs + shift, axis=axis, mode=mode)
-            minus = data.take(locs - shift, axis=axis, mode=mode)
-            results &= comparator(main, plus)
-            results &= comparator(main, minus)
-            if ~results.any():
-                return results
-        return results
-
-    def argrelmin(data, axis=0, order=1, mode='clip'):
-        return argrelextrema(data, np.less, axis, order, mode)
-
-    def argrelmax(data, axis=0, order=1, mode='clip'):
-
-        return argrelextrema(data, np.greater, axis, order, mode)
-
-    def argrelextrema(data, comparator, axis=0, order=1, mode='clip'):
-        results = _boolrelextrema(data, comparator, axis, order, mode)
-        return np.nonzero(results)
-
 import matplotlib.pyplot as plt
 
 from matplotlib.transforms import Bbox, TransformedBbox, blended_transform_factory
@@ -48,6 +12,40 @@ from mpl_toolkits.axes_grid1.inset_locator import BboxPatch, BboxConnector, Bbox
 from KRATER.Tools.Abstract import Tool
 
 from KRATER.Tools.Kmers import GenomeScope2
+
+
+def _boolrelextrema(data, comparator, axis=0, order=1, mode='clip'):
+
+    if (int(order) != order) or (order < 1):
+        raise ValueError('Order must be an int >= 1')
+
+    datalen = data.shape[axis]
+    locs = np.arange(0, datalen)
+
+    results = np.ones(data.shape, dtype=bool)
+    main = data.take(locs, axis=axis, mode=mode)
+    for shift in range(1, order + 1):
+        plus = data.take(locs + shift, axis=axis, mode=mode)
+        minus = data.take(locs - shift, axis=axis, mode=mode)
+        results &= comparator(main, plus)
+        results &= comparator(main, minus)
+        if ~results.any():
+            return results
+    return results
+
+
+def argrelmin(data, axis=0, order=1, mode='clip'):
+    return argrelextrema(data, np.less, axis, order, mode)
+
+
+def argrelmax(data, axis=0, order=1, mode='clip'):
+
+    return argrelextrema(data, np.greater, axis, order, mode)
+
+
+def argrelextrema(data, comparator, axis=0, order=1, mode='clip'):
+    results = _boolrelextrema(data, comparator, axis, order, mode)
+    return np.nonzero(results)
 
 
 class JellyfishRoutines(Tool):

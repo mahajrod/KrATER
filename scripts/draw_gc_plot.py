@@ -16,12 +16,7 @@ from matplotlib.ticker import MaxNLocator
 
 from distinctipy import distinctipy
 
-try:
-    from scipy.signal import argrelextrema
-except:
-    sys.stderr.write("WARNING!!! Impossible to import argrelextrema function form scipy.signal. Related functionality is disabled.\n")
-    # emergency import
-    from KRATER.Routines.JellyfishRoutines import argrelextrema
+from KRATER.Routines.JellyfishRoutines import argrelextrema
 
 from KRATER.Routines import FileRoutines, JellyfishRoutines
 

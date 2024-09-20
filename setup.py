@@ -31,9 +31,9 @@ def get_list_of_files(list_of_dirs_and_files, expression=None, recursive=True):
 setup(name='krater',
       version='2.7.12',
       packages=find_packages(),
-      author='Sergei F. Kliver',
+      author='Sergei Kliver',
       url='https://github.com/mahajrod/KRATER',
       author_email='mahajrod@gmail.com',
       scripts=get_list_of_files("scripts/"),
-      install_requires=['numpy', 'scipy', 'matplotlib', ],
+      install_requires=['numpy', 'matplotlib', ],
       long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read())
