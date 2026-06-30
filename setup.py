@@ -29,7 +29,7 @@ def get_list_of_files(list_of_dirs_and_files, expression=None, recursive=True):
 
 
 setup(name='krater',
-      version='2.7.12',
+      version='2.7.13',
       packages=find_packages(),
       author='Sergei Kliver',
       url='https://github.com/mahajrod/KRATER',
