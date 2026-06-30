@@ -10,9 +10,6 @@ requirements:
     - python {{ python }}
     - pip
     - setuptools
-    - numpy
-    - pandas
-    - matplotlib
   run:
     - python
     - numpy
